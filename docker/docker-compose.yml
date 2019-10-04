@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  dev:
+    image: rust
+    container_name: aworld-data-dev
+    volumes:
+      - ..:/app
+    tty: true
+    networks:
+      - app-net
+
+  mysql:
+    container_name: aworld-data-sql
+    image: mysql:5.7.27
+    environment:
+      MYSQL_ROOT_PASSWORD: "ourworld"
+    restart: 'always'
+    expose:
+      - '3306'
+    ports:
+      - "3306:3306"
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
