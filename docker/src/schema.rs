@@ -8,15 +8,6 @@ table! {
 }
 
 table! {
-    items (id) {
-        id -> Bigint,
-        name -> Char,
-        item_type -> Integer,
-        amount -> Bigint,
-    }
-}
-
-table! {
     terrains (id) {
         id -> Bigint,
         content -> Text,
@@ -25,6 +16,5 @@ table! {
 
 allow_tables_to_appear_in_same_query!(
     characters,
-    items,
     terrains,
 );
