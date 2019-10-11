@@ -6,3 +6,17 @@ table! {
         max_appetite -> Integer,
     }
 }
+
+table! {
+    items (id) {
+        id -> Bigint,
+        name -> Char,
+        item_type -> Integer,
+        amount -> Bigint,
+    }
+}
+
+allow_tables_to_appear_in_same_query!(
+    characters,
+    items,
+);
