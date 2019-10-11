@@ -1,4 +1,6 @@
 use crate::schema::characters;
+use crate::utils::generate_random_name;
+use rand::{thread_rng, Rng};
 
 #[derive(Queryable)]
 pub struct Character {
@@ -18,10 +20,11 @@ pub struct NewCharacter {
 
 impl std::default::Default for NewCharacter {
     fn default() -> Self {
+        let mut rng = rand::thread_rng();
         Self {
-            name: "foo".to_owned(),
-            max_hp: 1234,
-            max_appetite: 56789,
+            name: generate_random_name(0),
+            max_hp: 8000 + rng.gen_range(0, 4000),
+            max_appetite: 8000 + rng.gen_range(0, 4000),
         }
     }
 }
