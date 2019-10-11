@@ -20,6 +20,8 @@ table! {
     terrains (id) {
         id -> Bigint,
         content -> Text,
+        width -> Integer,
+        height -> Integer,
     }
 }
 
