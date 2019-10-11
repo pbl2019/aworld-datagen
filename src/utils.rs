@@ -44,3 +44,17 @@ macro_rules! define_enum {
         }
     }
 }
+
+use rand::{seq::IteratorRandom, thread_rng, Rng};
+static KATAKANAS: &str =
+    "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+
+pub fn generate_random_name(len: usize) -> String {
+    let mut rng = thread_rng();
+    let len = if len == 0 { rng.gen_range(2, 8) } else { len };
+    KATAKANAS
+        .chars()
+        .choose_multiple(&mut rng, len)
+        .into_iter()
+        .collect()
+}
