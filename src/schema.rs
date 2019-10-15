@@ -17,6 +17,15 @@ table! {
 }
 
 table! {
+    relations (id) {
+        id -> Bigint,
+        character_id -> Bigint,
+        target_id -> Bigint,
+        factor -> Double,
+    }
+}
+
+table! {
     terrains (id) {
         id -> Bigint,
         content -> Text,
@@ -28,5 +37,6 @@ table! {
 allow_tables_to_appear_in_same_query!(
     characters,
     items,
+    relations,
     terrains,
 );
