@@ -1,5 +1,6 @@
+#[derive(Debug)]
 pub struct Effect {
-    amount: i64,
-    blow: f32,
-    slash: f32,
+    pub amount: i64,
+    pub blow: f32,
+    pub slash: f32,
 }
