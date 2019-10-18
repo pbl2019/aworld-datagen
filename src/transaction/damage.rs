@@ -6,3 +6,8 @@ impl transaction{
 
 	}
 }
+
+#[test]
+fn testDamage(){
+	
+}
