@@ -21,8 +21,8 @@ pub struct NewCharacter {
 pub struct CharacterLocal {
     pub hp: i32,
     pub appetite: i32,
-    pub x: i32,
-    pub y: i32,
+    pub x: f32,
+    pub y: f32,
     pub angle: f32,
     pub model: Character,
 }
@@ -45,8 +45,8 @@ impl std::convert::From<Character> for CharacterLocal {
             model: model.clone(),
             hp: model.max_hp,
             appetite: model.max_appetite,
-            x: 0,
-            y: 0,
+            x: 0.,
+            y: 0.,
             angle: rng.gen_range(0., 2. * std::f64::consts::PI as f32),
         }
     }
