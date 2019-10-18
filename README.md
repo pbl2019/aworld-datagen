@@ -22,7 +22,7 @@
 
 ## For S.Kaito
 ``` cmd
-cd aworld-datagen/docker   # リポジトリディレクトリのdockerに入る
+cd Documents\GitHub\aworld-datagen\docker   # リポジトリディレクトリのdockerに入る
 docker-compose up -d     # Linux環境(dev)とMySQL立ち上げ
 docker-compose exec dev bash     # Linux環境(dev)に入る
 ```
