@@ -20,7 +20,7 @@ pub enum CharacterAction {
 pub enum CharacterEffect {
     Pushed(CharacterPushedPayload)
 
-    Damage(),
+    Damage(CharacterDamagedPayload),
     Dead,
 
     Recovery(CharacterRecoveryPayload),
