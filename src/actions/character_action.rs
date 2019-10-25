@@ -6,7 +6,7 @@ pub enum CharacterAction {
     TurnRight(CharacterTurnRightPayload),
 
     Attack,
-    Use {itemId: String},
+    Use(CharacterUsePayload) ,
     Defence,
     Avoid,
   
@@ -20,7 +20,7 @@ pub enum CharacterAction {
 pub enum CharacterEffect {
     Pushed(CharacterPushedPayload)
 
-    Damage { amount: i32 },
+    Damage(),
     Dead,
 
     Recovery(CharacterRecoveryPayload),
@@ -44,9 +44,17 @@ pub struct CharacterTurnRightPayload {
     angle: f32
 }
 
+pub struct CharacterUsePayload {
+	itemId: String
+}
+
 pub struct CharacterPushedPayload {
     angle: f32,
     speed: f32,
+}
+
+pub struct CharacterDamagedPayload {
+	amount: i32
 }
 
 pub struct CharacterRecoveryPayload {
