@@ -6,4 +6,9 @@ impl CharacterDispatcher {
         store.update_hp(store.hp - payload.amount);
         Ok(())
     }
+    fn effect_dead(store: &mut CharacterLocal, payload: &CharacterDamagePoyload) -> Result<()> {
+    	store.update_dead(true);
+        Ok(())
+    
+    }
 }

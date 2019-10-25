@@ -25,6 +25,7 @@ pub struct CharacterLocal {
     pub y: f32,
     pub angle: f32,
     pub model: Character,
+    pub isDead: bool,
 }
 
 impl std::default::Default for NewCharacter {
