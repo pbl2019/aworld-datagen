@@ -1,12 +1,12 @@
 #[derive(Debug)]
 pub enum CharacterEffect {
     Damage { amount: i32 },
-    Dead {},
+    Dead,
 }
 
 pub enum CharacterAction {
-    Attack {},
+    Attack,
     Use {itemId: String},
-    Defence {},
-    Avoid{},
+    Defence,
+    Avoid,
 }
