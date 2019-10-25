@@ -1,12 +1,10 @@
+#[derive(Debug)]
 pub enum CharacterAction {
     Forward { speed: f32 },
     Backward { speed: f32 },
     TurnLeft { angle: f32 },
     TurnRight { angle: f32 },
-}
 
-#[derive(Debug)]
-pub enum CharacterAction {
     Attack,
     Use {itemId: String},
     Defence,
@@ -20,6 +18,8 @@ pub enum CharacterAction {
 
 #[derive(Debug)]
 pub enum CharacterEffect {
+    Pushed { amount: f32 },
+
     Damage { amount: i32 },
     Dead,
 
