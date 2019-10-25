@@ -23,7 +23,7 @@ pub enum CharacterEffect {
     Damage { amount: i32 },
     Dead,
 
-    Recovery { amount: i32 },
+    Recovery(CharacterRecoveryPayload),
     WakeUp
     Disturb
 }
@@ -47,4 +47,8 @@ pub struct CharacterTurnRightPayload {
 pub struct CharacterPushedPayload {
     angle: f32,
     speed: f32,
+}
+
+pub struct CharacterRecoveryPayload {
+    amount: i32
 }
