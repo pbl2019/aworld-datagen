@@ -1,11 +1,11 @@
 struct RelationDispatcher;
 impl RelationDispatcher {
-	fn effect_befriend(store: &mut CharacterLocal, payload: &CharacterDamagePoyload) -> Result<()> {
+	fn effect_increase(store: &mut RelationLocal, payload: &RelationPayload) -> Result<()> {
 		store.update_factor(store.factor + payload.amount);
 		Ok(())
 	}
-	fn effect_worsening(store: &mut CharacterLocal, payload: &CharacterDamagePoyload) -> Result<()> {
-		store.update_factor(store.factor  payload.amount);
+	fn effect_decrease(store: &mut RelationLocal, payload: &RelationPayload) -> Result<()> {
+		store.update_factor(store.factor - payload.amount);
 		Ok(())
 	}
 }
