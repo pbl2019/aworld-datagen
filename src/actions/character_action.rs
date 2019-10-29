@@ -18,13 +18,13 @@ pub enum CharacterAction {
 
 #[derive(Debug)]
 pub enum CharacterEffect {
-    Pushed(CharacterPushedPayload)
+    Pushed(CharacterPushedPayload),
 
     Damage(CharacterDamagedPayload),
     Dead,
 
     Recovery(CharacterRecoveryPayload),
-    WakeUp
+    WakeUp,
     Disturb
 }
 

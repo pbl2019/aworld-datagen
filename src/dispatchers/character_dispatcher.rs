@@ -1,4 +1,6 @@
 struct CharacterDispatcher;
+
+#[derive(Debug)]
 impl CharacterDispatcher {
     fn forward(store: &mut CharacterLocal, payload: &CharacterForwardPayload) -> Result<()> {
         store.update_pos(store.x + store.angle.sin() * payload.speed, store.y + store.angle.cos() * payload.speed);
