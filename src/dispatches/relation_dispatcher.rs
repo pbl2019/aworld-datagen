@@ -9,3 +9,8 @@ impl RelationDispatcher {
 		Ok(())
 	}
 }
+
+#[test]
+fn test_dispatch(){
+	dispatcher = &RelationDispatcher;
+}
