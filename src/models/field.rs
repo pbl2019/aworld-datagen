@@ -1,25 +1,40 @@
+use std::clone::Clone;
 use std::sync::{Arc, RwLock};
 use std::thread;
 use std::time::Duration;
-use std::clone::Clone;
 
-struct Field<T: Clone> {
+#[macro_export]
+macro_rules! init_field {
+    ($e:expr) => {
+        Field::new($e)
+    };
+}
+
+pub struct Field<T: Clone> {
     data: Arc<RwLock<T>>,
+}
+
+impl<T: Clone> Field<T> {
+    pub fn new(data: T) -> Self {
+        Self {
+            data: Arc::new(RwLock::new(data)),
+        }
+    }
 }
 
 impl<T: Clone> std::clone::Clone for Field<T> {
     fn clone(&self) -> Self {
         Field {
-            data: self.data.clone()
+            data: self.data.clone(),
         }
     }
 }
 
 impl<T: Clone> Field<T> {
-    fn update(&mut self, replacer: T) {
+    pub fn write(&mut self, replacer: T) {
         *self.data.write().unwrap() = replacer;
     }
-    fn read(&self) -> T {
+    pub fn read(&self) -> T {
         self.data.read().unwrap().clone()
     }
 }
@@ -27,15 +42,15 @@ impl<T: Clone> Field<T> {
 #[test]
 fn test_field() {
     let x = Field {
-        data: Arc::new(RwLock::new(3))
+        data: Arc::new(RwLock::new(3)),
     };
     let mut x1 = x.clone();
     let mut x2 = x.clone();
     thread::spawn(move || {
-        x1.update(5);
+        x1.write(5);
     });
     thread::spawn(move || {
-        x2.update(10);
+        x2.write(10);
     });
     thread::sleep(Duration::from_millis(50));
     let x_ = x.read();

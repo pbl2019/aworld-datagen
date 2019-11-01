@@ -1,3 +1,5 @@
+use crate::init_field;
+use crate::models::field::Field;
 use crate::schema::characters;
 use crate::utils::generate_random_name;
 use rand::{thread_rng, Rng};
@@ -19,13 +21,14 @@ pub struct NewCharacter {
 }
 
 pub struct CharacterLocal {
-    pub hp: i32,
-    pub appetite: i32,
-    pub x: f32,
-    pub y: f32,
-    pub angle: f32,
     pub model: Character,
-    pub is_dead: bool,
+
+    pub hp: Field<i32>,
+    pub appetite: Field<i32>,
+    pub x: Field<f32>,
+    pub y: Field<f32>,
+    pub angle: Field<f32>,
+    pub is_dead: Field<bool>,
 }
 
 impl std::default::Default for NewCharacter {
@@ -44,12 +47,12 @@ impl std::convert::From<Character> for CharacterLocal {
         let mut rng = rand::thread_rng();
         Self {
             model: model.clone(),
-            hp: model.max_hp,
-            appetite: model.max_appetite,
-            x: 0.,
-            y: 0.,
-            angle: rng.gen_range(0., 2. * std::f64::consts::PI as f32),
-            is_dead: false,
+            hp: init_field!(model.max_hp),
+            appetite: init_field!(model.max_appetite),
+            x: init_field!(0.),
+            y: init_field!(0.),
+            angle: init_field!(rng.gen_range(0., 2. * std::f64::consts::PI as f32)),
+            is_dead: init_field!(false),
         }
     }
 }
