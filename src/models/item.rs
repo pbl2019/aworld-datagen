@@ -1,6 +1,7 @@
-use crate::define_enum;
+use crate::models::field::Field;
 use crate::schema::items;
 use crate::utils::generate_random_name;
+use crate::{define_enum, init_field};
 use num_traits::{FromPrimitive, ToPrimitive};
 use rand::{thread_rng, Rng};
 
@@ -13,7 +14,7 @@ define_enum! {
     }
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, Clone)]
 pub struct Item {
     pub id: i64,
     pub name: String,
@@ -29,6 +30,13 @@ pub struct NewItem {
     pub amount: i64,
 }
 
+pub struct ItemLocal {
+    pub model: Item,
+    pub is_used: Field<bool>,
+    pub max_durability: Field<i64>, // NOTE: アイテム毎で耐久度が異なる
+    pub durability: Field<i64>,
+}
+
 impl std::default::Default for NewItem {
     fn default() -> Self {
         let mut rng = rand::thread_rng();
@@ -36,6 +44,19 @@ impl std::default::Default for NewItem {
             name: generate_random_name(0),
             item_type: ItemType::from_u64(rng.gen_range(0, 2 + 1)).unwrap(),
             amount: rng.gen_range(0, 1000),
+        }
+    }
+}
+
+impl std::convert::From<Item> for ItemLocal {
+    fn from(model: Item) -> Self {
+        let mut rng = rand::thread_rng();
+        let max_durability = rng.gen_range(10, 1000);
+        Self {
+            model: model.clone(),
+            is_used: init_field!(false),
+            max_durability: init_field!(max_durability),
+            durability: init_field!(max_durability),
         }
     }
 }

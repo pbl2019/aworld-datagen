@@ -1,2 +1,1 @@
-mod character_action;
-pub use character_action::CharacterEffect;
+pub mod character_action;
