@@ -19,7 +19,7 @@ impl CharacterDispatcher {
         Ok(())
     }
     fn effect_pushed(store: &mut CharacterLocal, payload: &CharacterPushedPayload) -> Result<()> {
-        store.update_pos(store.x + payload.angle.sin(), store.y + payload.angle.cos());
+        store.update_pos(store.x + payload.angle.sin() * payload.speed, store.y + payload.angle.cos() * payload.speed);
         Ok(())
     }
 }
