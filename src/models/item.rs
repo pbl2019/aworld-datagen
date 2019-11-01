@@ -19,7 +19,6 @@ pub struct Item {
     pub name: String,
     pub item_type: ItemType,
     pub amount: i64,
-    pub is_used: bool,
 }
 
 #[derive(Insertable)]
@@ -28,7 +27,13 @@ pub struct NewItem {
     pub name: String,
     pub item_type: ItemType,
     pub amount: i64,
+}
+
+pub struct ItemLocal {
     pub is_used: bool,
+    pub max_durability: i64, // NOTE: アイテム毎で耐久度が異なる
+    pub durability: i64,
+    pub model: Item,
 }
 
 impl std::default::Default for NewItem {
@@ -38,7 +43,6 @@ impl std::default::Default for NewItem {
             name: generate_random_name(0),
             item_type: ItemType::from_u64(rng.gen_range(0, 2 + 1)).unwrap(),
             amount: rng.gen_range(0, 1000),
-            is_used: false,
         }
     }
 }

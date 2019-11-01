@@ -25,7 +25,7 @@ pub struct CharacterLocal {
     pub y: f32,
     pub angle: f32,
     pub model: Character,
-    pub isDead: bool,
+    pub is_dead: bool,
 }
 
 impl std::default::Default for NewCharacter {
@@ -49,6 +49,7 @@ impl std::convert::From<Character> for CharacterLocal {
             x: 0.,
             y: 0.,
             angle: rng.gen_range(0., 2. * std::f64::consts::PI as f32),
+            is_dead: false,
         }
     }
 }
