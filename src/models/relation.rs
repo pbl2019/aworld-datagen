@@ -1,3 +1,5 @@
+use crate::init_field;
+use crate::models::field::Field;
 use crate::schema::items;
 use rand::{thread_rng, Rng};
 
@@ -17,12 +19,28 @@ pub struct NewRelation {
     pub factor: f64,
 }
 
+pub struct RelationLocal {
+    pub model: Relation,
+
+    pub factor: Field<f64>,
+}
+
 impl NewRelation {
     pub fn new_random(character_id: i64, target_id: i64) -> Self {
         Self {
             character_id,
             target_id,
             factor: rng.gen_range(-1.0, 1.0),
+        }
+    }
+}
+
+impl std::convert::From<Relation> for RelationLocal {
+    fn from(model: Relation) -> Self {
+        let mut rng = rand::thread_rng();
+        Self {
+            model: model.clone(),
+            factor: init_field!(model.factor),
         }
     }
 }
