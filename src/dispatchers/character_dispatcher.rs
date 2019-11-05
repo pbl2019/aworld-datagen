@@ -18,14 +18,13 @@ impl CharacterDispatcher {
 }
 
 #[test]
-fn testCharacter(){
-	let cd = CharacterDispatcher();
+fn test_damage(){
 	let cl = CharacterLocal(NewCharacter::default())
-	assert!(cd.effect_damage(cl,CharacterDamagePayload({amount: 10})) != 0)
-	assert!(cd.effect_damage(cl,CharacterDamagePayload({amount: 10})) == Ok(()))
-	assert!(cd.effect_damage(cl,CharacterDamagePayload({amount: 10})) != -1)
-	assert!(cd.effect_damage(cl,CharacterDamagePayload({amount: 10})) != "a")
-	assert!(cd.effect_damage(cl,CharacterDamagePayload({amount: 10})) != "null")
+	assert!(CharacterDispatcher::effect_damage(cl,CharacterDamagePayload({amount: 10})) != 0)
+	assert!(CharacterDispatcher::effect_damage(cl,CharacterDamagePayload({amount: 10})) == Ok(()))
+	assert!(CharacterDispatcher::effect_damage(cl,CharacterDamagePayload({amount: 10})) != -1)
+	assert!(CharacterDispatcher::effect_damage(cl,CharacterDamagePayload({amount: 10})) != "a")
+	assert!(CharacterDispatcher::effect_damage(cl,CharacterDamagePayload({amount: 10})) != "null")
 }
 
 #[test]
