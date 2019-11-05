@@ -20,9 +20,28 @@ pub struct NewTerrain {
     pub height: i32,
 }
 
+#[derive(Clone)]
+pub enum Entity {
+    Character { character_id: i64 },
+    Item { item_id: i64 },
+}
+
+#[derive(Clone)]
+pub enum Obstacle {
+    Entity(Entity),
+    Terrain(TerrainInfo),
+}
+
+#[derive(Clone)]
+pub enum TerrainInfo {
+    Floor = 0,
+    Wall = 1,
+}
+
 pub struct TerrainLocal {
     pub model: Terrain,
     pub raw: Field<Vec<u8>>,
+    pub entities: Field<Vec<Entity>>,
 }
 
 impl std::default::Default for NewTerrain {
@@ -49,6 +68,7 @@ impl std::convert::From<Terrain> for TerrainLocal {
             model: model.clone(),
 
             raw: init_field!(raw),
+            entities: init_field!(Vec::new()),
         }
     }
 }
