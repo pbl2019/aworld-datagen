@@ -29,7 +29,24 @@ pub struct CharacterLocal {
     pub y: Field<f32>,
     pub angle: Field<f32>,
     pub is_dead: Field<bool>,
+    pub sleep_state: Field<Sleeping>,
 }
+
+#[derive(Debug, Clone)]
+pub struct Sleeping {
+    pub state: SleepingState,
+    pub depth: i32,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum SleepingState {
+    GettingUp,
+    Sleeping,
+    Idle,
+}
+
+pub const MAX_SLEEP_AMOUNT: i32 = 60/*[sec]*/ * 90/*[min]*/;
+pub const MIN_SLEEP_AMOUNT: i32 = 0;
 
 impl std::default::Default for NewCharacter {
     fn default() -> Self {
@@ -45,6 +62,10 @@ impl std::default::Default for NewCharacter {
 impl std::convert::From<Character> for CharacterLocal {
     fn from(model: Character) -> Self {
         let mut rng = rand::thread_rng();
+        let sleep = Sleeping {
+            state: SleepingState::GettingUp,
+            depth: 0
+        };
         Self {
             model: model.clone(),
             hp: init_field!(model.max_hp),
@@ -53,6 +74,7 @@ impl std::convert::From<Character> for CharacterLocal {
             y: init_field!(0.),
             angle: init_field!(rng.gen_range(0., 2. * std::f64::consts::PI as f32)),
             is_dead: init_field!(false),
+            sleep_state: init_field!(sleep),
         }
     }
 }
