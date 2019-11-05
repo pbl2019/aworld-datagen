@@ -1,9 +1,47 @@
 use crate::actions::character_action::*;
 use crate::models::character::*;
 use std::io::Result;
+use std::f32::consts::PI;
 
 struct CharacterDispatcher;
 impl CharacterDispatcher {
+    fn action_forward(store: &mut CharacterLocal, payload: &CharacterForwardPayload) -> Result<()> {
+        let mut x = store.x.read() + store.angle.read().sin() * payload.speed;
+        let mut y = store.y.read() + store.angle.read().cos() * payload.speed;
+        store.x.write(x);
+        store.y.write(y);
+        Ok(())
+    }
+    fn action_backward(store: &mut CharacterLocal, payload: &CharacterBackwardPayload) -> Result<()> {
+        let mut x = store.x.read() - store.angle.read().sin() * payload.speed;
+        let mut y = store.y.read() - store.angle.read().cos() * payload.speed;
+        store.x.write(x);
+        store.y.write(y);
+        Ok(())
+    }
+    fn action_turn_left(store: &mut CharacterLocal, payload: &CharacterTurnLeftPayload) -> Result<()> {
+        let mut angle = store.angle.read() - payload.angle;
+        if angle < 0. {
+            angle = (2.*PI - angle).rem_euclid(2.*PI);
+        }
+        store.angle.write(angle);
+        Ok(())
+    }
+    fn action_turn_right(store: &mut CharacterLocal, payload: &CharacterTurnRightPayload) -> Result<()> {
+        let mut angle = store.angle.read() + payload.angle;
+        if angle >= 2.*PI {
+            angle = angle.rem_euclid(2.*PI);
+        }
+        store.angle.write(angle);
+        Ok(())
+    }
+    fn effect_pushed(store: &mut CharacterLocal, payload: &CharacterPushedPayload) -> Result<()> {
+        let mut x = store.x.read() +  store.angle.read().sin() * payload.speed;
+        let mut y = store.y.read() +  store.angle.read().cos() * payload.speed;
+        store.x.write(x);
+        store.y.write(y);
+        Ok(())
+    }
     fn action_sleep(store: &mut CharacterLocal) -> Result<()> {
         let sleep_state = Sleeping {
             state: SleepingState::Sleeping,
@@ -70,6 +108,77 @@ impl CharacterDispatcher {
         store.sleep_state.write(sleep_state);
         Ok(())
     }
+}
+
+#[test]
+fn dispatch_action_forward_up() {
+    let mock = Character { id: 001, name: "tset".to_string(), max_hp: 100, max_appetite: 200 };
+    let mut character = CharacterLocal::from(mock);
+    character.angle.write(0.);
+    let action = CharacterForwardPayload { speed: 1. };
+    character.y.write(0.);
+    let res = CharacterDispatcher::action_forward(&mut character, &action);
+    assert!(res.is_ok());
+    assert!(character.y.read() == 1.);
+}
+
+#[test]
+fn dispatch_action_forward_cross() {
+    let mock = Character { id: 001, name: "tset".to_string(), max_hp: 100, max_appetite: 200 };
+    let mut character = CharacterLocal::from(mock);
+    character.angle.write(0.3*PI);
+    let action = CharacterForwardPayload { speed: 1. };
+    character.y.write(0.);
+    let res = CharacterDispatcher::action_forward(&mut character, &action);
+    assert!(res.is_ok());
+    assert!((character.y.read()*1000.).trunc() == 587.);
+}
+
+#[test]
+fn dispatch_action_backward_up() {
+    let mock = Character { id: 001, name: "tset".to_string(), max_hp: 100, max_appetite: 200 };
+    let mut character = CharacterLocal::from(mock);
+    character.angle.write(0.);
+    let action = CharacterBackwardPayload { speed: 1. };
+    character.y.write(0.);
+    let res = CharacterDispatcher::action_backward(&mut character, &action);
+    assert!(res.is_ok());
+    assert!(character.y.read() == -1.);
+}
+
+
+#[test]
+fn dispatch_action_backward_cross() {
+    let mock = Character { id: 001, name: "tset".to_string(), max_hp: 100, max_appetite: 200 };
+    let mut character = CharacterLocal::from(mock);
+    character.angle.write(0.3*PI);
+    let action = CharacterBackwardPayload { speed: 1. };
+    character.y.write(0.);
+    let res = CharacterDispatcher::action_backward(&mut character, &action);
+    assert!(res.is_ok());
+    assert!((character.y.read()*1000.).trunc() == -587.);
+}
+
+#[test]
+fn dispatch_action_turn_left() {
+    let mock = Character { id: 001, name: "tset".to_string(), max_hp: 100, max_appetite: 200 };
+    let mut character = CharacterLocal::from(mock);
+    character.angle.write(0.3);
+    let action = CharacterTurnLeftPayload { angle: 0.1 };
+    let res = CharacterDispatcher::action_turn_left(&mut character, &action);
+    assert!(res.is_ok());
+    assert!((character.angle.read()-0.2).abs() < 0.01);
+}
+
+#[test]
+fn dispatch_action_turn_right() {
+    let mock = Character { id: 001, name: "tset".to_string(), max_hp: 100, max_appetite: 200 };
+    let mut character = CharacterLocal::from(mock);
+    character.angle.write(0.3);
+    let action = CharacterTurnRightPayload { angle: 0.1 };
+    let res = CharacterDispatcher::action_turn_right(&mut character, &action);
+    assert!(res.is_ok());
+    assert!((character.angle.read()-0.4).abs() < 0.01);
 }
 
 #[test]
