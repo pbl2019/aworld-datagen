@@ -4,7 +4,7 @@ use crate::schema::characters;
 use crate::utils::generate_random_name;
 use rand::{thread_rng, Rng};
 
-#[derive(Queryable, Clone)]
+#[derive(Queryable, Clone, Debug)]
 pub struct Character {
     pub id: i64,
     pub name: String,
@@ -20,6 +20,7 @@ pub struct NewCharacter {
     pub max_appetite: i32,
 }
 
+#[derive(Debug)]
 pub struct CharacterLocal {
     pub model: Character,
 
