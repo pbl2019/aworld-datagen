@@ -12,4 +12,3 @@ pub enum ItemEffect {
 pub struct ItemBreakPayload {
     durability: f32,
 }
-
