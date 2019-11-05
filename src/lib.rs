@@ -9,3 +9,4 @@ pub mod models;
 pub mod query;
 pub mod schema;
 pub mod utils;
+pub mod dispatchers;
