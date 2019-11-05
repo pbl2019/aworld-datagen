@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["tamamu <tamamu.1r1s@gmail.com>"]
 edition = "2018"
 
+[[bin]]
+name = "server"
+path = "src/bin/server.rs"
+
 [dependencies]
 diesel = { version = "1.0.0", features = ["mysql"] }
 dotenv = "0.9.0"

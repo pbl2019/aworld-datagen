@@ -1,0 +1,7 @@
+CREATE TABLE relations (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  character_id BIGINT NOT NULL,
+  target_id BIGINT NOT NULL,
+  factor DOUBLE NOT NULL DEFAULT 0.0,
+  PRIMARY KEY (id)
+)
