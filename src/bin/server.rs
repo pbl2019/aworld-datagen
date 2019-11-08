@@ -32,11 +32,18 @@ impl UdpServer {
                 Ok(s) => {
                     eprintln!("{:?}", s);
                     let query = serde_json::from_str::<Query>(s);
-                    println!("{:?}", query);
-                    match query_to_action(query) {
-                        Ok(action) => {}
+                    match query {
+                        Ok(query) => {
+                            println!("{:?}", query);
+                            match query_to_action(&query) {
+                                Ok(action) => {}
+                                Err(err) => {
+                                    eprintln!("{}", err);
+                                }
+                            }
+                        }
                         Err(err) => {
-                            eprintln!("{}", err);
+                            eprintln!("{:?}", err);
                         }
                     }
                 }

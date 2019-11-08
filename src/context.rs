@@ -24,5 +24,6 @@ impl Context {
         self.login_infos
             .get(&conn.addr)
             .and_then(|id| self.characters.get(&id))
+            .and_then(|p| Some(p.clone()))
     }
 }
