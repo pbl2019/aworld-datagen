@@ -1,10 +1,11 @@
 use crate::init_field;
 use crate::models::field::Field;
+use crate::models::ObjectId;
 use crate::schema::terrains;
 use base64;
 use rand::Rng;
 
-#[derive(Queryable, Clone)]
+#[derive(Queryable, Clone, Debug)]
 pub struct Terrain {
     pub id: i64,
     pub content: String,
@@ -20,9 +21,23 @@ pub struct NewTerrain {
     pub height: i32,
 }
 
+#[derive(Clone)]
+pub enum Obstacle {
+    Object(ObjectId),
+    Terrain(TerrainInfo),
+}
+
+#[derive(Clone)]
+pub enum TerrainInfo {
+    Floor = 0,
+    Wall = 1,
+}
+
+#[derive(Debug)]
 pub struct TerrainLocal {
     pub model: Terrain,
     pub raw: Field<Vec<u8>>,
+    pub entities: Field<Vec<ObjectId>>,
 }
 
 impl std::default::Default for NewTerrain {
@@ -49,6 +64,7 @@ impl std::convert::From<Terrain> for TerrainLocal {
             model: model.clone(),
 
             raw: init_field!(raw),
+            entities: init_field!(Vec::new()),
         }
     }
 }

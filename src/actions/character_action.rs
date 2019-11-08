@@ -26,41 +26,41 @@ pub enum CharacterEffect {
 
 #[derive(Debug)]
 pub struct CharacterForwardPayload {
-    speed: f32,
+    pub speed: f32,
 }
 
 #[derive(Debug)]
 pub struct CharacterBackwardPayload {
-    speed: f32,
+    pub speed: f32,
 }
 
 #[derive(Debug)]
 pub struct CharacterTurnLeftPayload {
-    angle: f32,
+    pub angle: f32,
 }
 
 #[derive(Debug)]
 pub struct CharacterTurnRightPayload {
-    angle: f32,
+    pub angle: f32,
 }
 
 #[derive(Debug)]
 pub struct CharacterUsePayload {
-    item_id: String,
+    pub item_id: String,
 }
 
 #[derive(Debug)]
 pub struct CharacterPushedPayload {
-    angle: f32,
-    speed: f32,
+    pub angle: f32,
+    pub speed: f32,
 }
 
 #[derive(Debug)]
 pub struct CharacterDamagedPayload {
-    amount: i32,
+    pub amount: i32,
 }
 
 #[derive(Debug)]
 pub struct CharacterRecoveryPayload {
-    amount: i32,
+    pub depth: i32,
 }

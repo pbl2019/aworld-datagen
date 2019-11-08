@@ -14,7 +14,7 @@ define_enum! {
     }
 }
 
-#[derive(Queryable, Clone)]
+#[derive(Queryable, Clone, Debug)]
 pub struct Item {
     pub id: i64,
     pub name: String,
@@ -30,6 +30,7 @@ pub struct NewItem {
     pub amount: i64,
 }
 
+#[derive(Debug)]
 pub struct ItemLocal {
     pub model: Item,
     pub is_used: Field<bool>,
