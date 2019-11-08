@@ -4,6 +4,8 @@ use std::convert::TryFrom;
 
 mod backward;
 mod forward;
+mod turn_left;
+mod turn_right;
 
 pub fn query_to_action(query: &Query) -> Result<CharacterAction, &'static str> {
     match query.kind {
@@ -16,7 +18,7 @@ pub fn query_to_action(query: &Query) -> Result<CharacterAction, &'static str> {
             Ok(CharacterAction::Backward(payload))
         }
         QueryKind::Attack => {
-            Ok(CharacterAction::Attack())
+            Ok(CharacterAction::Attack)
         }
         QueryKind::TurnLeft => {
             let payload = TryFrom::try_from(&query.payload).unwrap();

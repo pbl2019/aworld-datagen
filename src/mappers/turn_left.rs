@@ -9,7 +9,7 @@ impl std::convert::TryFrom<&Value> for CharacterTurnLeftPayload {
         match payload {
             Value::Object(map) => {
                 if let Some(angle) = map.get("angle") {
-                    Ok(CharacterForwardPayload {
+                    Ok(CharacterTurnLeftPayload {
                         angle: angle.as_f64().unwrap() as f32,
                     })
                 } else {
