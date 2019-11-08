@@ -15,6 +15,17 @@ pub fn query_to_action(query: &Query) -> Result<CharacterAction, &'static str> {
             let payload = TryFrom::try_from(&query.payload).unwrap();
             Ok(CharacterAction::Backward(payload))
         }
+        QueryKind::Attack => {
+            Ok(CharacterAction::Attack())
+        }
+        QueryKind::TurnLeft => {
+            let payload = TryFrom::try_from(&query.payload).unwrap();
+            Ok(CharacterAction::TurnLeft(payload))
+        }
+        QueryKind::TurnRight => {
+            let payload = TryFrom::try_from(&query.payload).unwrap();
+            Ok(CharacterAction::TurnRight(payload))
+        }
         _ => unimplemented!(),
     }
 }
