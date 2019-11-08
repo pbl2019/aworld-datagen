@@ -4,11 +4,11 @@ pub enum ItemAction {
 
 #[derive(Debug)]
 pub enum ItemEffect {
-    Spend,
-    Break(ItemBreakPayload),
+	Spend,
+	Break(ItemBreakPayload),
 }
 
 #[derive(Debug)]
 pub struct ItemBreakPayload {
-    durability: f32,
+	pub durability: i64,
 }
