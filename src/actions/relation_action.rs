@@ -11,10 +11,10 @@ pub enum RelationEffect {
 
 #[derive(Debug)]
 pub struct RelationIncreasePayload {
-	amount: f32,
+	pub amount: f64,
 }
 
 #[derive(Debug)]
 pub struct RelationDecreasePayload {
-	amount: f32,
+	pub amount: f64,
 }
