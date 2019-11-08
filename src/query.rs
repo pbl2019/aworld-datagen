@@ -4,6 +4,7 @@ use serde_json::Value;
 
 #[derive(Debug)]
 pub enum QueryKind {
+    Login,
     Attack,
     Forward,
     Backward,
@@ -19,7 +20,12 @@ impl<'de> serde::Deserialize<'de> for QueryKind {
     {
         let s = String::deserialize(deserializer)?;
         Ok(match s.as_str() {
+            "login" => QueryKind::Login,
             "attack" => QueryKind::Attack,
+            "forward" => QueryKind::Forward,
+            "backward" => QueryKind::Backward,
+            "turnleft" => QueryKind::TurnLeft,
+            "turnright" => QueryKind::TurnRight,
             _ => QueryKind::Unknown(s),
         })
     }
@@ -27,7 +33,7 @@ impl<'de> serde::Deserialize<'de> for QueryKind {
 
 #[derive(Debug, Deserialize)]
 pub struct Query {
-    character_id: String,
-    kind: QueryKind,
-    payload: Value,
+    pub addr: String,
+    pub kind: QueryKind,
+    pub payload: Value,
 }
