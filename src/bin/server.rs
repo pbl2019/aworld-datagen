@@ -1,3 +1,4 @@
+use aworld_datagen::mappers::query_to_action;
 use aworld_datagen::query::*;
 use std::collections::VecDeque;
 use std::io;
@@ -32,7 +33,12 @@ impl UdpServer {
                     eprintln!("{:?}", s);
                     let query = serde_json::from_str::<Query>(s);
                     println!("{:?}", query);
-                    // TODO: dispatcherとの繋ぎ込み
+                    match query_to_action(query) {
+                        Ok(action) => {}
+                        Err(err) => {
+                            eprintln!("{}", err);
+                        }
+                    }
                 }
                 Err(err) => {
                     eprintln!("{:?}", err);
