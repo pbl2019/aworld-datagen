@@ -10,6 +10,7 @@ macro_rules! init_field {
     };
 }
 
+#[derive(Debug)]
 pub struct Field<T: Clone> {
     data: Arc<RwLock<T>>,
 }

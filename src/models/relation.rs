@@ -1,9 +1,9 @@
 use crate::init_field;
 use crate::models::field::Field;
-use crate::schema::items;
+use crate::schema::relations;
 use rand::{thread_rng, Rng};
 
-#[derive(Queryable)]
+#[derive(Queryable, Clone, Debug)]
 pub struct Relation {
     pub id: i64,
     pub character_id: i64,
@@ -19,6 +19,7 @@ pub struct NewRelation {
     pub factor: f64,
 }
 
+#[derive(Debug)]
 pub struct RelationLocal {
     pub model: Relation,
 
@@ -27,6 +28,7 @@ pub struct RelationLocal {
 
 impl NewRelation {
     pub fn new_random(character_id: i64, target_id: i64) -> Self {
+        let mut rng = rand::thread_rng();
         Self {
             character_id,
             target_id,
