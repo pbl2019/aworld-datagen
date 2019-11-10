@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+use aworld_datagen::actions::character_action::CharacterAction;
 use aworld_datagen::mappers::query_to_action;
 use aworld_datagen::query::*;
 use std::collections::VecDeque;
@@ -8,7 +9,7 @@ use std::str;
 
 struct UdpServer {
     socket: UdpSocket,
-    queue: VecDeque<Query>,
+    queue: VecDeque<(String, CharacterAction)>,
 }
 
 impl UdpServer {
@@ -37,7 +38,9 @@ impl UdpServer {
                         Ok(query) => {
                             println!("{:?}", query);
                             match query_to_action(&query) {
-                                Ok(_action) => {}
+                                Ok(action) => {
+                                    self.queue.push_back((query.addr, action));
+                                }
                                 Err(err) => {
                                     eprintln!("{}", err);
                                 }
