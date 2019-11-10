@@ -21,7 +21,7 @@ macro_rules! define_enum {
             fn to_sql<W: std::io::Write>(
                 &self,
                 out: &mut diesel::serialize::Output<W, DB>,
-            ) -> Result<diesel::serialize::IsNull, Box<std::error::Error + Send + Sync>> {
+            ) -> Result<diesel::serialize::IsNull, Box<dyn std::error::Error + Send + Sync>> {
                 ToSql::<Integer, DB>::to_sql(&(*self as i32), out)
             }
         }
@@ -33,7 +33,7 @@ macro_rules! define_enum {
         {
             fn from_sql(
                 bytes: Option<&DB::RawValue>,
-            ) -> Result<Self, Box<std::error::Error + Send + Sync>> {
+            ) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
                 use self::$name::*;
 
                 match <i32 as FromSql<Integer, DB>>::from_sql(bytes)? {

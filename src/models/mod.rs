@@ -15,10 +15,10 @@ pub enum ObjectId {
 
 #[derive(Clone, Debug)]
 pub enum EntityId {
-    Character(i64),
-    Item(i64),
-    Terrain(i64),
-    Relation(i64),
+    Character(u64),
+    Item(u64),
+    Terrain(u64),
+    Relation(u64),
 }
 
 #[derive(Clone)]

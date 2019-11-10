@@ -1,7 +1,8 @@
 use crate::init_field;
 use crate::models::field::Field;
 use crate::schema::relations;
-use rand::{thread_rng, Rng};
+use chrono::Utc;
+use rand::Rng;
 
 #[derive(Queryable, Clone, Debug)]
 pub struct Relation {
@@ -21,6 +22,7 @@ pub struct NewRelation {
 
 #[derive(Debug)]
 pub struct RelationLocal {
+    pub entity_id: i64,
     pub model: Relation,
 
     pub factor: Field<f64>,
@@ -39,8 +41,8 @@ impl NewRelation {
 
 impl std::convert::From<Relation> for RelationLocal {
     fn from(model: Relation) -> Self {
-        let mut rng = rand::thread_rng();
         Self {
+            entity_id: Utc::now().timestamp(),
             model: model.clone(),
             factor: init_field!(model.factor),
         }
