@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 use std::clone::Clone;
 use std::sync::{Arc, RwLock};
 use std::thread;
@@ -32,7 +33,7 @@ impl<T: Clone> std::clone::Clone for Field<T> {
 }
 
 impl<T: Clone> Field<T> {
-    pub fn write(&mut self, replacer: T) {
+    pub fn write(&self, replacer: T) {
         *self.data.write().unwrap() = replacer;
     }
     pub fn read(&self) -> T {
@@ -45,8 +46,8 @@ fn test_field() {
     let x = Field {
         data: Arc::new(RwLock::new(3)),
     };
-    let mut x1 = x.clone();
-    let mut x2 = x.clone();
+    let x1 = x.clone();
+    let x2 = x.clone();
     thread::spawn(move || {
         x1.write(5);
     });

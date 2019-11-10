@@ -2,7 +2,8 @@ use crate::init_field;
 use crate::models::field::Field;
 use crate::schema::characters;
 use crate::utils::generate_random_name;
-use rand::{thread_rng, Rng};
+use chrono::Utc;
+use rand::Rng;
 
 #[derive(Queryable, Clone, Debug)]
 pub struct Character {
@@ -22,6 +23,7 @@ pub struct NewCharacter {
 
 #[derive(Debug)]
 pub struct CharacterLocal {
+    pub entity_id: i64,
     pub model: Character,
 
     pub hp: Field<i32>,
@@ -65,9 +67,10 @@ impl std::convert::From<Character> for CharacterLocal {
         let mut rng = rand::thread_rng();
         let sleep = Sleeping {
             state: SleepingState::GettingUp,
-            depth: 0
+            depth: 0,
         };
         Self {
+            entity_id: Utc::now().timestamp(),
             model: model.clone(),
             hp: init_field!(model.max_hp),
             appetite: init_field!(model.max_appetite),
