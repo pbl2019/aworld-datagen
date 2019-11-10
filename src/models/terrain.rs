@@ -3,6 +3,7 @@ use crate::models::field::Field;
 use crate::models::ObjectId;
 use crate::schema::terrains;
 use base64;
+use chrono::Utc;
 use rand::Rng;
 
 #[derive(Queryable, Clone, Debug)]
@@ -27,7 +28,7 @@ pub enum Obstacle {
     Terrain(TerrainInfo),
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum TerrainInfo {
     Floor = 0,
     Wall = 1,
@@ -35,9 +36,17 @@ pub enum TerrainInfo {
 
 #[derive(Debug)]
 pub struct TerrainLocal {
+    pub entity_id: i64,
     pub model: Terrain,
+
     pub raw: Field<Vec<u8>>,
     pub entities: Field<Vec<ObjectId>>,
+}
+
+impl TerrainLocal {
+    pub fn raycast(&self, _x: f32, _y: f32, _angle: f32, _distance: f32) -> Option<Obstacle> {
+        unimplemented!()
+    }
 }
 
 impl std::default::Default for NewTerrain {
@@ -46,7 +55,7 @@ impl std::default::Default for NewTerrain {
         let width = rng.gen_range(50, 100);
         let height = rng.gen_range(50, 100);
         let mut raw = Vec::with_capacity(width * height);
-        for j in 0..width * height {
+        for _ in 0..width * height {
             raw.push(rng.gen_range(0, 1 + 1));
         }
         Self {
@@ -61,6 +70,7 @@ impl std::convert::From<Terrain> for TerrainLocal {
     fn from(model: Terrain) -> Self {
         let raw = base64::decode(&model.content).unwrap();
         Self {
+            entity_id: Utc::now().timestamp(),
             model: model.clone(),
 
             raw: init_field!(raw),

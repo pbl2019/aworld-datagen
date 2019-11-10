@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use aworld_datagen::mappers::query_to_action;
 use aworld_datagen::query::*;
 use std::collections::VecDeque;
@@ -12,7 +13,7 @@ struct UdpServer {
 
 impl UdpServer {
     fn new(addr: &str) -> io::Result<Self> {
-        let mut socket = UdpSocket::bind(addr)?;
+        let socket = UdpSocket::bind(addr)?;
         Ok(UdpServer {
             socket,
             queue: VecDeque::new(),
@@ -23,7 +24,7 @@ impl UdpServer {
         loop {
             let mut buf = [0; 4096];
             println!("receive...");
-            let (num_of_bytes, src_addr) = self
+            let (num_of_bytes, _src_addr) = self
                 .socket
                 .recv_from(&mut buf)
                 .expect("didn't receive data");
@@ -36,7 +37,7 @@ impl UdpServer {
                         Ok(query) => {
                             println!("{:?}", query);
                             match query_to_action(&query) {
-                                Ok(action) => {}
+                                Ok(_action) => {}
                                 Err(err) => {
                                     eprintln!("{}", err);
                                 }
@@ -52,12 +53,11 @@ impl UdpServer {
                 }
             }
         }
-        Ok(())
     }
 }
 
 fn main() {
     let mut server = UdpServer::new("127.0.0.1:34254").unwrap();
-    server.start();
+    server.start().unwrap();
     // TODO: queueを処理するスレッドを動かす
 }
