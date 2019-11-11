@@ -35,7 +35,7 @@ impl<T: Clone> std::clone::Clone for Field<T> {
 impl<T: Clone + std::fmt::Debug> Field<T> {
     pub fn write(&self, replacer: T) {
         let latest = self.data.read().unwrap().clone();
-        let dbg = format!("[WRITE] <{:p}: {:?}> ← {:?}", self, latest, replacer);
+        let dbg = format!("[WRITE] <{:p}: {:?}> ← {:?}", self.data, latest, replacer);
         *self.data.write().unwrap() = replacer;
         eprintln!("{} ... ok", dbg);
     }
