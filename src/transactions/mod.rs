@@ -9,7 +9,7 @@ pub fn call_transaction_with(
     conn: &Connection,
     context: &mut Context,
     action: CharacterAction,
-) -> Result<(), ()> {
+) -> Result<(), String> {
     match action {
         CharacterAction::Forward(payload) => {
             forward(conn, context, &payload).and_then(|mutations| {
@@ -17,6 +17,6 @@ pub fn call_transaction_with(
                 Ok(())
             })
         }
-        _ => Err(()),
+        _ => Err(format!("[ERROR] Action {:?} is not implemented", action)),
     }
 }

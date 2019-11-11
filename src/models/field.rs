@@ -32,11 +32,22 @@ impl<T: Clone> std::clone::Clone for Field<T> {
     }
 }
 
-impl<T: Clone> Field<T> {
+impl<T: Clone + std::fmt::Debug> Field<T> {
     pub fn write(&self, replacer: T) {
+        println!(
+            "[WRITE] <{:p}: {:?}> <- {:?}",
+            self,
+            self.data.read().unwrap().clone(),
+            replacer
+        );
         *self.data.write().unwrap() = replacer;
     }
     pub fn read(&self) -> T {
+        println!(
+            "[READ] <{:p}: {:?}>",
+            self,
+            self.data.read().unwrap().clone(),
+        );
         self.data.read().unwrap().clone()
     }
 }

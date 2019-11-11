@@ -10,8 +10,8 @@ use rand::Rng;
 pub struct Terrain {
     pub id: i64,
     pub content: String,
-    pub width: u32,
-    pub height: u32,
+    pub width: i32,
+    pub height: i32,
 }
 
 #[derive(Insertable)]

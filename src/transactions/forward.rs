@@ -9,7 +9,7 @@ pub fn forward(
     conn: &Connection,
     context: &Context,
     payload: &CharacterForwardPayload,
-) -> Result<Vec<i64>, ()> {
+) -> Result<Vec<i64>, String> {
     let mut updated = Vec::new();
     if let Some(character) = context.get_character_from_connection(conn) {
         let x = character.x.read();
@@ -45,6 +45,9 @@ pub fn forward(
         }
         Ok(updated)
     } else {
-        Err(())
+        Err(format!(
+            "[ERROR] {:?} has not been associated to any character",
+            conn.addr,
+        ))
     }
 }
