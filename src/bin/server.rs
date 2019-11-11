@@ -29,8 +29,9 @@ impl UdpServer {
 
     fn start(&mut self) -> io::Result<()> {
         println!(
-            "Aworld Data server has started on {:?}",
-            self.socket.local_addr().unwrap()
+            "Aworld Data server v{} has started on {:?}",
+            env!("CARGO_PKG_VERSION"),
+            self.socket.local_addr().unwrap(),
         );
         loop {
             let mut buf = [0; 4096];
