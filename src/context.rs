@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 use crate::connection::Connection;
+use crate::log;
 use crate::models::character::CharacterLocal;
 use crate::models::item::ItemLocal;
 use crate::models::relation::RelationLocal;
@@ -60,7 +61,8 @@ impl Context {
         }
         // TODO: Remove here if secure
         if let Some(_) = self.entities.get(&entity_id) {
-            panic!("BUG: Same entity id has been found!");
+            log!("BUG", "Same entity id has been found");
+            panic!("same entity id has been found");
         }
         self.entities.insert(entity_id, entity.clone());
     }

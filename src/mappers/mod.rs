@@ -9,17 +9,13 @@ mod turn_right;
 
 pub fn query_to_action(query: &Query) -> Result<CharacterAction, &'static str> {
     match query.kind {
-        QueryKind::Forward => {
-            let payload = TryFrom::try_from(&query.payload).unwrap();
-            Ok(CharacterAction::Forward(payload))
-        }
+        QueryKind::Forward => TryFrom::try_from(&query.payload)
+            .and_then(|payload| Ok(CharacterAction::Forward(payload))),
         QueryKind::Backward => {
             let payload = TryFrom::try_from(&query.payload).unwrap();
             Ok(CharacterAction::Backward(payload))
         }
-        QueryKind::Attack => {
-            Ok(CharacterAction::Attack)
-        }
+        QueryKind::Attack => Ok(CharacterAction::Attack),
         QueryKind::TurnLeft => {
             let payload = TryFrom::try_from(&query.payload).unwrap();
             Ok(CharacterAction::TurnLeft(payload))

@@ -17,6 +17,6 @@ pub fn call_transaction_with(
                 Ok(())
             })
         }
-        _ => Err(format!("[ERROR] Action {:?} is not implemented", action)),
+        _ => Err(format!("Action {:?} is not implemented", action)),
     }
 }

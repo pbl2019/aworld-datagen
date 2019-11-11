@@ -4,6 +4,7 @@ use crate::context::Context;
 use crate::dispatchers::character_dispatcher::CharacterDispatcher;
 use crate::models::terrain::*;
 use crate::models::ObjectId;
+use crate::{dbg, err};
 
 pub fn forward(
     conn: &Connection,
@@ -27,12 +28,12 @@ pub fn forward(
                                 updated.push(pushee.entity_id);
                                 Ok(())
                             })
-                            .unwrap_or_else(|e| eprintln!("{:?}", e));
+                            .unwrap_or_else(|e| err!("{:?}", e));
                     }
                     ObjectId::Item(_item_id) => unimplemented!(),
                 },
                 Obstacle::Terrain(info) => {
-                    eprintln!("{} tackled to {:?}", character.model.name, info);
+                    dbg!("{} tackled to {:?}", character.model.name, info);
                 }
             }
         } else {
@@ -41,12 +42,12 @@ pub fn forward(
                     updated.push(character.entity_id);
                     Ok(())
                 })
-                .unwrap_or_else(|e| eprintln!("{:?}", e));
+                .unwrap_or_else(|e| err!("{:?}", e));
         }
         Ok(updated)
     } else {
         Err(format!(
-            "[ERROR] {:?} has not been associated to any character",
+            "{:?} has not been associated to any character",
             conn.addr,
         ))
     }

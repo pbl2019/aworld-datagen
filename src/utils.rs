@@ -58,3 +58,24 @@ pub fn generate_random_name(len: usize) -> String {
         .into_iter()
         .collect()
 }
+
+#[macro_export]
+macro_rules! dbg {
+    () => (eprint!("\x1b[1;33m[DEBUG  ]\x1b[0m \n"));
+    ($fmt:expr) => (eprint!(concat!("\x1b[1;33m[DEBUG  ]\x1b[0;33m ", $fmt, "\x1b[0m\n")));
+    ($fmt:expr, $($arg:tt)*) => (eprint!(concat!("\x1b[1;33m[DEBUG  ]\x1b[0;33m ", $fmt, "\x1b[0m\n"), $($arg)*));
+}
+
+#[macro_export]
+macro_rules! err {
+    () => (eprint!("\x1b[1;31m[ERROR  ]\x1b[0m \n"));
+    ($fmt:expr) => (eprint!(concat!("\x1b[1;31m[ERROR  ]\x1b[0;31m ", $fmt, "\x1b[0m\n")));
+    ($fmt:expr, $($arg:tt)*) => (eprint!(concat!("\x1b[1;31m[ERROR  ]\x1b[0;31m ", $fmt, "\x1b[0m\n"), $($arg)*));
+}
+
+#[macro_export]
+macro_rules! log {
+    ($placeholder:expr) => (eprint!("\x1b[1;32m[{:7}]\x1b[0m \n", $placeholder));
+    ($placeholder:expr, $fmt:expr) => (eprint!(concat!("\x1b[1;32m[{:7}]\x1b[0;32m ", $fmt, "\x1b[0m\n"), $placeholder));
+    ($placeholder:expr, $fmt:expr, $($arg:tt)*) => (eprint!(concat!("\x1b[1;32m[{:7}]\x1b[0;32m ", $fmt, "\x1b[0m\n"), $placeholder, $($arg)*));
+}

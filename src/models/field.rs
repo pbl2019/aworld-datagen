@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+use crate::log;
 use std::clone::Clone;
 use std::sync::{Arc, RwLock};
 use std::thread;
@@ -35,13 +36,13 @@ impl<T: Clone> std::clone::Clone for Field<T> {
 impl<T: Clone + std::fmt::Debug> Field<T> {
     pub fn write(&self, replacer: T) {
         let latest = self.data.read().unwrap().clone();
-        let dbg = format!("[WRITE] <{:p}: {:?}> ← {:?}", self.data, latest, replacer);
+        let dbg = format!("<{:p}: {:?}> ← {:?}", self.data, latest, replacer);
         *self.data.write().unwrap() = replacer;
-        eprintln!("{} ... ok", dbg);
+        log!("WRITE", "{} ... ok", dbg);
     }
     pub fn read(&self) -> T {
         let latest = self.data.read().unwrap().clone();
-        eprintln!("[READ] <{:p}: {:?}>", self, latest,);
+        log!("READ", "<{:p}: {:?}>", self, latest);
         latest
     }
 }

@@ -6,6 +6,7 @@ use aworld_datagen::mappers::query_to_action;
 use aworld_datagen::models::terrain::*;
 use aworld_datagen::query::*;
 use aworld_datagen::transactions::call_transaction_with;
+use aworld_datagen::{dbg, err, log};
 use std::collections::VecDeque;
 use std::io;
 use std::net::UdpSocket;
@@ -33,35 +34,32 @@ impl UdpServer {
         );
         loop {
             let mut buf = [0; 4096];
-            println!("\nwaiting datagram...");
+            dbg!("waiting datagram...");
             let (num_of_bytes, _src_addr) = self
                 .socket
                 .recv_from(&mut buf)
-                .expect("didn't receive data");
+                .expect("[FATAL  ] didn't receive data");
             let filled_buf = &mut buf[..num_of_bytes];
             match str::from_utf8(filled_buf) {
                 Ok(s) => {
-                    eprintln!("{:?}", s);
+                    log!("RECEIVE", "{:?}", s);
                     let query = serde_json::from_str::<Query>(s);
                     match query {
-                        Ok(query) => {
-                            println!("{:?}", query);
-                            match query_to_action(&query) {
-                                Ok(action) => {
-                                    self.queue.write().unwrap().push_back((query.addr, action));
-                                }
-                                Err(err) => {
-                                    eprintln!("{}", err);
-                                }
+                        Ok(query) => match query_to_action(&query) {
+                            Ok(action) => {
+                                self.queue.write().unwrap().push_back((query.addr, action));
                             }
-                        }
+                            Err(err) => {
+                                err!("Couldn't parse payload because expected {}", err);
+                            }
+                        },
                         Err(err) => {
-                            eprintln!("{:?}", err);
+                            err!("Couldn't parse query because {}", err);
                         }
                     }
                 }
                 Err(err) => {
-                    eprintln!("{:?}", err);
+                    err!("{:?}", err);
                 }
             }
         }
@@ -84,10 +82,10 @@ fn main() {
         // TODO: データ投入
         loop {
             if let Some((ip, action)) = queue.write().unwrap().pop_front() {
-                println!("[TRANSACTION] {:?} from {:?}", action, ip);
+                log!("ACTION", "{:?} from {:?}", action, ip);
                 let conn = Connection { addr: ip };
                 call_transaction_with(&conn, &mut context, action).unwrap_or_else(|e| {
-                    eprintln!("{}", e);
+                    err!("{}", e);
                 });
             }
         }

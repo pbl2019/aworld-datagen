@@ -1,7 +1,7 @@
 use crate::actions::character_action::*;
 use serde_json::value::Value;
 
-static EXPECTION: &'static str = r#"expect {"angle": float}"#;
+static EXPECTION: &'static str = r#"{"angle": float}"#;
 
 impl std::convert::TryFrom<&Value> for CharacterTurnLeftPayload {
     type Error = &'static str;

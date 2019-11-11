@@ -1,7 +1,7 @@
 use crate::actions::character_action::CharacterBackwardPayload;
 use serde_json::value::Value;
 
-static EXPECTION: &'static str = r#"expect {"speed": float}"#;
+static EXPECTION: &'static str = r#"{"speed": float}"#;
 
 impl std::convert::TryFrom<&Value> for CharacterBackwardPayload {
     type Error = &'static str;
