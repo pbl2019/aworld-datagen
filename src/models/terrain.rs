@@ -40,13 +40,7 @@ pub struct TerrainLocal {
     pub model: Terrain,
 
     pub raw: Field<Vec<u8>>,
-    pub entities: Field<Vec<ObjectId>>,
-}
-
-impl TerrainLocal {
-    pub fn raycast(&self, _x: f32, _y: f32, _angle: f32, _distance: f32) -> Option<Obstacle> {
-        unimplemented!()
-    }
+    pub object_ids: Field<Vec<ObjectId>>,
 }
 
 impl std::default::Default for NewTerrain {
@@ -74,7 +68,7 @@ impl std::convert::From<Terrain> for TerrainLocal {
             model: model.clone(),
 
             raw: init_field!(raw),
-            entities: init_field!(Vec::new()),
+            object_ids: init_field!(Vec::new()),
         }
     }
 }

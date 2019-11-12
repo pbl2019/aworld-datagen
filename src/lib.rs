@@ -12,5 +12,6 @@ pub mod mappers;
 pub mod models;
 pub mod query;
 pub mod schema;
+pub mod services;
 pub mod transactions;
 pub mod utils;

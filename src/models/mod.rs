@@ -7,13 +7,13 @@ pub mod item;
 pub mod relation;
 pub mod terrain;
 
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum ObjectId {
     Character(i64),
     Item(i64),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum EntityId {
     Character(i64),
     Item(i64),

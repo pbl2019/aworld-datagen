@@ -17,7 +17,7 @@ pub fn forward(
         let y = character.y.read();
         let angle = character.angle.read();
         let speed = payload.speed;
-        if let Some(obstacle) = context.terrain.raycast(x, y, angle, speed) {
+        if let Some(obstacle) = context.raycast(x, y, angle, speed) {
             match obstacle {
                 Obstacle::Object(object_id) => match object_id {
                     ObjectId::Character(character_id) => {
