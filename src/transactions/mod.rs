@@ -1,10 +1,14 @@
 use crate::actions::{character_action::CharacterAction, system_action::SystemAction, Action};
 use crate::connection::Connection;
 use crate::context::Context;
-use crate::transactions::{forward::forward, login::login};
+use crate::transactions::{
+    forward::forward, login::login, turn_left::turn_left, turn_right::turn_right,
+};
 
 pub mod forward;
 pub mod login;
+pub mod turn_left;
+pub mod turn_right;
 
 pub fn call_transaction_with(
     conn: &Connection,
@@ -15,6 +19,18 @@ pub fn call_transaction_with(
         Action::Character(character_action) => match character_action {
             CharacterAction::Forward(payload) => {
                 forward(conn, context, &payload).and_then(|mutations| {
+                    context.mark_mutations(mutations);
+                    Ok(())
+                })
+            }
+            CharacterAction::TurnLeft(payload) => {
+                turn_left(conn, context, &payload).and_then(|mutations| {
+                    context.mark_mutations(mutations);
+                    Ok(())
+                })
+            }
+            CharacterAction::TurnRight(payload) => {
+                turn_right(conn, context, &payload).and_then(|mutations| {
                     context.mark_mutations(mutations);
                     Ok(())
                 })

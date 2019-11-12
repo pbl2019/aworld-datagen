@@ -23,8 +23,8 @@ impl<'de> serde::Deserialize<'de> for QueryKind {
             "attack" => QueryKind::Attack,
             "forward" => QueryKind::Forward,
             "backward" => QueryKind::Backward,
-            "turnleft" => QueryKind::TurnLeft,
-            "turnright" => QueryKind::TurnRight,
+            "turn_left" => QueryKind::TurnLeft,
+            "turn_right" => QueryKind::TurnRight,
             _ => QueryKind::Unknown(s),
         })
     }

@@ -36,11 +36,18 @@ impl Context {
             terrain,
         }
     }
-    pub fn get_character_from_connection(&self, conn: &Connection) -> Option<Arc<CharacterLocal>> {
+    pub fn get_character_from_connection(
+        &self,
+        conn: &Connection,
+    ) -> Result<Arc<CharacterLocal>, String> {
         self.ip_to_character_id
             .get(&conn.addr)
             .and_then(|id| self.characters.get(&id))
             .and_then(|p| Some(p.clone()))
+            .ok_or(format!(
+                "{:?} has not been associated to any character",
+                conn.addr
+            ))
     }
     pub fn insert_entity(&mut self, entity: Entity) {
         let entity_id;

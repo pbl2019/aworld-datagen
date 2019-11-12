@@ -3,7 +3,7 @@ use aworld_datagen::actions::Action;
 use aworld_datagen::connection::Connection;
 use aworld_datagen::context::Context;
 use aworld_datagen::mappers::query_to_action;
-use aworld_datagen::models::{character::*, terrain::*, Entity};
+use aworld_datagen::models::{terrain::*, Entity};
 use aworld_datagen::query::*;
 use aworld_datagen::transactions::call_transaction_with;
 use aworld_datagen::{dbg, err, log};
@@ -21,6 +21,7 @@ type ActionQueue = VecDeque<(String, Action)>;
 // TODO: クライアントへ送るjsonのシリアライズ
 // TODO: もっとマシな方法を考える
 struct CharacterView {
+    pub character_id: i64,
     pub x: f32,
     pub y: f32,
     pub angle: f32,
@@ -136,18 +137,18 @@ fn main() {
     let mut now = Instant::now();
     thread::spawn(move || loop {
         let mut mutated_entities;
-        let ip_addrs: Vec<String>;
+        let ip_with_character_ids: Vec<(String, i64)>;
         {
             let mut lock = context2.write().unwrap();
             mutated_entities = lock.get_mutated_entities();
-            ip_addrs = lock
+            ip_with_character_ids = lock
                 .ip_to_character_id
-                .keys()
-                .map(|addr| addr.clone())
+                .iter()
+                .map(|(ip, id)| (ip.clone(), *id))
                 .collect();
         }
         mutated_entities.retain(|entity| match entity {
-            Entity::Character(local) => true,
+            Entity::Character(_) => true,
             _ => false,
         });
         if mutated_entities.is_empty() {
@@ -157,6 +158,7 @@ fn main() {
             .iter()
             .map(|entity| match entity {
                 Entity::Character(local) => CharacterView {
+                    character_id: local.model.id,
                     x: local.x.read(),
                     y: local.y.read(),
                     angle: local.angle.read(),
@@ -164,15 +166,18 @@ fn main() {
                 _ => panic!(),
             })
             .collect();
-        let buf = format!(
+        let data = format!(
             r#"{{
             "characters": {:?}
         }}"#,
             mutated_characters
         );
-        dbg!("{}", buf);
-        for addr in ip_addrs.into_iter() {
-            sender.send(&buf, &addr);
+        for (ip, character_id) in ip_with_character_ids.into_iter() {
+            let buf = format!(r#"{{"character_id": {}, {}}}"#, character_id, data);
+            sender.send(&buf, &ip).unwrap_or_else(|e| {
+                err!("{:?}", e);
+                panic!(e)
+            });
         }
         now = Instant::now();
         sleep(Duration::new(0, 5 * 1000 * 1000)); // NOTE: 5msスリープ
