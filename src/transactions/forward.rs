@@ -8,7 +8,7 @@ use crate::{dbg, err};
 
 pub fn forward(
     conn: &Connection,
-    context: &Context,
+    context: &mut Context,
     payload: &CharacterForwardPayload,
 ) -> Result<Vec<i64>, String> {
     let mut updated = Vec::new();

@@ -23,6 +23,9 @@ pub struct Context {
 
 impl Context {
     pub fn new(terrain: TerrainLocal) -> Self {
+        let terrain = Arc::new(terrain);
+        let mut entities = HashMap::new();
+        entities.insert(terrain.model.id, terrain.clone());
         Self {
             entities: HashMap::new(),
             mutated_entity_ids: HashSet::new(),
@@ -30,7 +33,7 @@ impl Context {
             characters: HashMap::new(),
             items: HashMap::new(),
             relations: HashMap::new(),
-            terrain: Arc::new(terrain),
+            terrain,
         }
     }
     pub fn get_character_from_connection(&self, conn: &Connection) -> Option<Arc<CharacterLocal>> {

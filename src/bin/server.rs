@@ -1,9 +1,9 @@
 #![allow(dead_code)]
-use aworld_datagen::actions::character_action::CharacterAction;
+use aworld_datagen::actions::Action;
 use aworld_datagen::connection::Connection;
 use aworld_datagen::context::Context;
 use aworld_datagen::mappers::query_to_action;
-use aworld_datagen::models::terrain::*;
+use aworld_datagen::models::{character::*, terrain::*, Entity};
 use aworld_datagen::query::*;
 use aworld_datagen::transactions::call_transaction_with;
 use aworld_datagen::{dbg, err, log};
@@ -14,7 +14,7 @@ use std::str;
 use std::sync::{Arc, RwLock};
 use std::thread;
 
-type ActionQueue = VecDeque<(String, CharacterAction)>;
+type ActionQueue = VecDeque<(String, Action)>;
 
 struct UdpServer {
     socket: UdpSocket,
@@ -81,6 +81,14 @@ fn main() {
         let terrain_local = TerrainLocal::from(terrain);
         let mut context = Context::new(terrain_local);
         // TODO: データ投入
+        context.insert_entity(Entity::Character(Arc::new(CharacterLocal::from(
+            Character {
+                id: 1,
+                name: "foo".to_owned(),
+                max_hp: 30,
+                max_appetite: 8000,
+            },
+        ))));
         loop {
             if let Some((ip, action)) = queue.write().unwrap().pop_front() {
                 log!("ACTION", "{:?} from {:?}", action, ip);
