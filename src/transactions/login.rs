@@ -50,7 +50,8 @@ pub fn login(
                 max_hp: 100,
                 max_appetite: 8000,
             };
-            let character_local = CharacterLocal::from(character);
+            let mut character_local = CharacterLocal::from(character);
+            character_local.angle.write(0.0);
             context
                 .ip_to_character_id
                 .insert(conn.addr.clone(), character_local.model.id);

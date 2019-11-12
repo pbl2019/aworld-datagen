@@ -4,7 +4,7 @@ use serde_json::value::Value;
 static EXPECTION: &'static str = r#"{"character_id": integer | null, "password": string | null}"#;
 
 impl std::convert::TryFrom<&Value> for SystemLoginPayload {
-    type Error = &'static str;
+    type Error = String;
     fn try_from(payload: &Value) -> Result<Self, Self::Error> {
         match payload {
             Value::Object(map) => {
@@ -25,7 +25,7 @@ impl std::convert::TryFrom<&Value> for SystemLoginPayload {
                     password,
                 })
             }
-            _ => Err(EXPECTION),
+            _ => Err(EXPECTION.to_owned()),
         }
     }
 }

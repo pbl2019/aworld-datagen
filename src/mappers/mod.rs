@@ -8,7 +8,7 @@ mod login;
 mod turn_left;
 mod turn_right;
 
-pub fn query_to_action(query: &Query) -> Result<Action, &'static str> {
+pub fn query_to_action(query: &Query) -> Result<Action, String> {
     match query.kind {
         QueryKind::Login => TryFrom::try_from(&query.payload)
             .and_then(|payload| Ok(Action::System(SystemAction::Login(payload)))),
@@ -27,6 +27,6 @@ pub fn query_to_action(query: &Query) -> Result<Action, &'static str> {
             let payload = TryFrom::try_from(&query.payload).unwrap();
             Ok(Action::Character(CharacterAction::TurnRight(payload)))
         }
-        _ => unimplemented!(),
+        _ => Err(format!("Cannot convert query {:?} to action", query.kind)),
     }
 }

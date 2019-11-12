@@ -4,7 +4,7 @@ use serde_json::value::Value;
 static EXPECTION: &'static str = r#"{"speed": float}"#;
 
 impl std::convert::TryFrom<&Value> for CharacterForwardPayload {
-    type Error = &'static str;
+    type Error = String;
     fn try_from(payload: &Value) -> Result<Self, Self::Error> {
         match payload {
             Value::Object(map) => {
@@ -13,10 +13,10 @@ impl std::convert::TryFrom<&Value> for CharacterForwardPayload {
                         speed: speed.as_f64().unwrap() as f32,
                     })
                 } else {
-                    Err(EXPECTION)
+                    Err(EXPECTION.to_owned())
                 }
             }
-            _ => Err(EXPECTION),
+            _ => Err(EXPECTION.to_owned()),
         }
     }
 }

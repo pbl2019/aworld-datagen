@@ -9,6 +9,9 @@ services:
     tty: true
     networks:
       - app-net
+    ports:
+      - "34254:34254/udp"
+      - "34253:34253/udp"
 
   mysql:
     container_name: aworld-data-sql
@@ -18,12 +21,8 @@ services:
     restart: 'always'
     expose:
       - '3306'
-      - '34254'
-      - '34253'
     ports:
       - "3306:3306"
-      - "34254:34254"
-      - "34253:34253"
     networks:
       - app-net
 
