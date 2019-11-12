@@ -74,4 +74,12 @@ impl Context {
             self.mutated_entity_ids.insert(id);
         }
     }
+    pub fn get_mutated_entities(&mut self) -> Vec<Entity> {
+        let mut res = Vec::new();
+        for id in self.mutated_entity_ids.drain() {
+            let entity = self.entities.get(&id).unwrap();
+            res.push(entity.clone());
+        }
+        res
+    }
 }

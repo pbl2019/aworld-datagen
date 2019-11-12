@@ -8,31 +8,61 @@ use aworld_datagen::query::*;
 use aworld_datagen::transactions::call_transaction_with;
 use aworld_datagen::{dbg, err, log};
 use std::collections::VecDeque;
+use std::fmt;
 use std::io;
 use std::net::UdpSocket;
 use std::str;
 use std::sync::{Arc, RwLock};
-use std::thread;
+use std::thread::{self, sleep};
+use std::time::{Duration, Instant};
 
 type ActionQueue = VecDeque<(String, Action)>;
 
-struct UdpServer {
+// TODO: クライアントへ送るjsonのシリアライズ
+// TODO: もっとマシな方法を考える
+struct CharacterView {
+    pub x: f32,
+    pub y: f32,
+    pub angle: f32,
+}
+
+impl fmt::Debug for CharacterView {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            r#"{{"x": {}, "y": {}, "angle": {}}}"#,
+            self.x, self.y, self.angle
+        )
+    }
+}
+// ------------------------------------------ //
+
+struct UdpSender {
+    socket: UdpSocket,
+}
+
+impl UdpSender {
+    fn new(addr: &str) -> io::Result<Self> {
+        let socket = UdpSocket::bind(addr)?;
+        Ok(Self { socket })
+    }
+    fn send(&self, data: &str, addr: &str) -> io::Result<usize> {
+        self.socket.send_to(data.as_bytes(), addr)
+    }
+}
+
+struct UdpReceiver {
     socket: UdpSocket,
     queue: Arc<RwLock<ActionQueue>>,
 }
 
-impl UdpServer {
+impl UdpReceiver {
     fn new(addr: &str, queue: Arc<RwLock<ActionQueue>>) -> io::Result<Self> {
         let socket = UdpSocket::bind(addr)?;
-        Ok(UdpServer { socket, queue })
+        Ok(Self { socket, queue })
     }
 
     fn start(&mut self) -> io::Result<()> {
-        println!(
-            "Aworld Data server v{} has started on {:?}",
-            env!("CARGO_PKG_VERSION"),
-            self.socket.local_addr().unwrap(),
-        );
         loop {
             let mut buf = [0; 4096];
             dbg!("waiting datagram...");
@@ -69,35 +99,83 @@ impl UdpServer {
 
 fn main() {
     let queue = Arc::new(RwLock::new(VecDeque::new()));
-    let mut server = UdpServer::new("127.0.0.1:34254", queue.clone()).unwrap();
+    let mut receiver = UdpReceiver::new("127.0.0.1:34254", queue.clone()).unwrap();
+    let sender = UdpSender::new("127.0.0.1:34249").unwrap();
+
+    println!(
+        "Aworld Data server v{} has started on {:?}",
+        env!("CARGO_PKG_VERSION"),
+        receiver.socket.local_addr().unwrap(),
+    );
+
+    let new_terrain = NewTerrain::default();
+    let terrain = Terrain {
+        id: 0,
+        content: new_terrain.content,
+        width: new_terrain.width,
+        height: new_terrain.height,
+    };
+    let terrain_local = TerrainLocal::from(terrain);
+    let context = Arc::new(RwLock::new(Context::new(terrain_local)));
+    let context2 = context.clone();
+
     thread::spawn(move || {
-        let new_terrain = NewTerrain::default();
-        let terrain = Terrain {
-            id: 0,
-            content: new_terrain.content,
-            width: new_terrain.width,
-            height: new_terrain.height,
-        };
-        let terrain_local = TerrainLocal::from(terrain);
-        let mut context = Context::new(terrain_local);
         // TODO: データ投入
-        context.insert_entity(Entity::Character(Arc::new(CharacterLocal::from(
-            Character {
-                id: 1,
-                name: "foo".to_owned(),
-                max_hp: 30,
-                max_appetite: 8000,
-            },
-        ))));
         loop {
             if let Some((ip, action)) = queue.write().unwrap().pop_front() {
                 log!("ACTION", "{:?} from {:?}", action, ip);
                 let conn = Connection { addr: ip };
-                call_transaction_with(&conn, &mut context, action).unwrap_or_else(|e| {
-                    err!("{}", e);
-                });
+                call_transaction_with(&conn, &mut context.write().unwrap(), action).unwrap_or_else(
+                    |e| {
+                        err!("{}", e);
+                    },
+                );
             }
         }
     });
-    server.start().unwrap();
+    let mut now = Instant::now();
+    thread::spawn(move || loop {
+        let mut mutated_entities;
+        let ip_addrs: Vec<String>;
+        {
+            let mut lock = context2.write().unwrap();
+            mutated_entities = lock.get_mutated_entities();
+            ip_addrs = lock
+                .ip_to_character_id
+                .keys()
+                .map(|addr| addr.clone())
+                .collect();
+        }
+        mutated_entities.retain(|entity| match entity {
+            Entity::Character(local) => true,
+            _ => false,
+        });
+        if mutated_entities.is_empty() {
+            continue;
+        }
+        let mutated_characters: Vec<CharacterView> = mutated_entities
+            .iter()
+            .map(|entity| match entity {
+                Entity::Character(local) => CharacterView {
+                    x: local.x.read(),
+                    y: local.y.read(),
+                    angle: local.angle.read(),
+                },
+                _ => panic!(),
+            })
+            .collect();
+        let buf = format!(
+            r#"{{
+            "characters": {:?}
+        }}"#,
+            mutated_characters
+        );
+        dbg!("{}", buf);
+        for addr in ip_addrs.into_iter() {
+            sender.send(&buf, &addr);
+        }
+        now = Instant::now();
+        sleep(Duration::new(0, 5 * 1000 * 1000)); // NOTE: 5msスリープ
+    });
+    receiver.start().unwrap();
 }
