@@ -166,12 +166,7 @@ fn main() {
                 _ => panic!(),
             })
             .collect();
-        let data = format!(
-            r#"{{
-            "characters": {:?}
-        }}"#,
-            mutated_characters
-        );
+        let data = format!(r#""characters": {:?}"#, mutated_characters);
         for (ip, character_id) in ip_with_character_ids.into_iter() {
             let buf = format!(r#"{{"character_id": {}, {}}}"#, character_id, data);
             sender.send(&buf, &ip).unwrap_or_else(|e| {
