@@ -14,7 +14,7 @@ pub type Repository<T> = HashMap<i64, Arc<T>>;
 pub struct Context {
     entities: HashMap<i64, Entity>,
     mutated_entity_ids: HashSet<i64>,
-    pub ip_to_character_id: HashMap<String, i64>,
+    pub connection_to_character_id: HashMap<Connection, i64>,
     pub characters: Repository<CharacterLocal>,
     pub items: Repository<ItemLocal>,
     pub relations: Repository<RelationLocal>,
@@ -29,7 +29,7 @@ impl Context {
         Self {
             entities: HashMap::new(),
             mutated_entity_ids: HashSet::new(),
-            ip_to_character_id: HashMap::new(),
+            connection_to_character_id: HashMap::new(),
             characters: HashMap::new(),
             items: HashMap::new(),
             relations: HashMap::new(),
@@ -40,13 +40,13 @@ impl Context {
         &self,
         conn: &Connection,
     ) -> Result<Arc<CharacterLocal>, String> {
-        self.ip_to_character_id
-            .get(&conn.addr)
+        self.connection_to_character_id
+            .get(&conn)
             .and_then(|id| self.characters.get(&id))
             .and_then(|p| Some(p.clone()))
             .ok_or(format!(
                 "{:?} has not been associated to any character",
-                conn.addr
+                conn
             ))
     }
     pub fn insert_entity(&mut self, entity: Entity) {

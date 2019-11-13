@@ -32,6 +32,7 @@ impl<'de> serde::Deserialize<'de> for QueryKind {
 
 #[derive(Debug, Deserialize)]
 pub struct Query {
+    pub salt: i64,
     pub addr: String,
     pub kind: QueryKind,
     pub payload: Value,

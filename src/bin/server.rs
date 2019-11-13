@@ -16,7 +16,7 @@ use std::sync::{Arc, RwLock};
 use std::thread::{self, sleep};
 use std::time::{Duration, Instant};
 
-type ActionQueue = VecDeque<(String, Action)>;
+type ActionQueue = VecDeque<(String, i64, Action)>;
 
 // TODO: クライアントへ送るjsonのシリアライズ
 // TODO: もっとマシな方法を考える
@@ -65,7 +65,7 @@ impl UdpReceiver {
 
     fn start(&mut self) -> io::Result<()> {
         loop {
-            let mut buf = [0; 4096];
+            let mut buf = [0; 8192];
             dbg!("waiting datagram...");
             let (num_of_bytes, _src_addr) = self
                 .socket
@@ -79,7 +79,10 @@ impl UdpReceiver {
                     match query {
                         Ok(query) => match query_to_action(&query) {
                             Ok(action) => {
-                                self.queue.write().unwrap().push_back((query.addr, action));
+                                self.queue
+                                    .write()
+                                    .unwrap()
+                                    .push_back((query.addr, query.salt, action));
                             }
                             Err(err) => {
                                 err!("Couldn't parse payload because expected {}", err);
@@ -123,9 +126,9 @@ fn main() {
     thread::spawn(move || {
         // TODO: データ投入
         loop {
-            if let Some((ip, action)) = queue.write().unwrap().pop_front() {
-                log!("ACTION", "{:?} from {:?}", action, ip);
-                let conn = Connection { addr: ip };
+            if let Some((ip, salt, action)) = queue.write().unwrap().pop_front() {
+                log!("ACTION", "{:?} from {}/{}", action, ip, salt);
+                let conn = Connection { addr: ip, salt };
                 call_transaction_with(&conn, &mut context.write().unwrap(), action).unwrap_or_else(
                     |e| {
                         err!("{}", e);
@@ -137,14 +140,14 @@ fn main() {
     let mut now = Instant::now();
     thread::spawn(move || loop {
         let mut mutated_entities;
-        let ip_with_character_ids: Vec<(String, i64)>;
+        let connection_with_character_ids: Vec<(Connection, i64)>;
         {
             let mut lock = context2.write().unwrap();
             mutated_entities = lock.get_mutated_entities();
-            ip_with_character_ids = lock
-                .ip_to_character_id
+            connection_with_character_ids = lock
+                .connection_to_character_id
                 .iter()
-                .map(|(ip, id)| (ip.clone(), *id))
+                .map(|(conn, id)| (conn.clone(), *id))
                 .collect();
         }
         mutated_entities.retain(|entity| match entity {
@@ -167,9 +170,9 @@ fn main() {
             })
             .collect();
         let data = format!(r#""characters": {:?}"#, mutated_characters);
-        for (ip, character_id) in ip_with_character_ids.into_iter() {
+        for (connection, character_id) in connection_with_character_ids.into_iter() {
             let buf = format!(r#"{{"character_id": {}, {}}}"#, character_id, data);
-            sender.send(&buf, &ip).unwrap_or_else(|e| {
+            sender.send(&buf, &connection.addr).unwrap_or_else(|e| {
                 err!("{:?}", e);
                 panic!(e)
             });

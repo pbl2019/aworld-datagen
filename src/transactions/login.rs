@@ -20,7 +20,7 @@ pub fn login(
         Err(_) => {
             if let Some(character_id) = payload.character_id {
                 if context
-                    .ip_to_character_id
+                    .connection_to_character_id
                     .iter()
                     .any(|(_, cid)| *cid == character_id)
                 {
@@ -35,8 +35,8 @@ pub fn login(
                         .any(|(_, local)| local.model.id == character_id)
                     {
                         context
-                            .ip_to_character_id
-                            .insert(conn.addr.clone(), character_id);
+                            .connection_to_character_id
+                            .insert(conn.clone(), character_id);
                         let character = context.characters.get(&character_id).unwrap();
                         updated.push(character.entity_id);
                         Ok(updated)
@@ -56,8 +56,8 @@ pub fn login(
                 character_local.angle.write(0.0);
                 updated.push(character_local.entity_id);
                 context
-                    .ip_to_character_id
-                    .insert(conn.addr.clone(), character_local.model.id);
+                    .connection_to_character_id
+                    .insert(conn.clone(), character_local.model.id);
                 context.insert_entity(Entity::Character(Arc::new(character_local)));
                 Ok(updated)
             }
