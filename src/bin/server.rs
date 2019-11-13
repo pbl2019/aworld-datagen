@@ -31,8 +31,8 @@ impl fmt::Debug for CharacterView {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"{{"x": {}, "y": {}, "angle": {}}}"#,
-            self.x, self.y, self.angle
+            r#"{{"character_id": {}, "x": {}, "y": {}, "angle": {}}}"#,
+            self.character_id, self.x, self.y, self.angle
         )
     }
 }
