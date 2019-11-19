@@ -44,12 +44,20 @@ pub struct TerrainLocal {
 }
 
 impl NewTerrain {
+    pub fn with_size(width: usize, height: usize) -> Self {
+        let raw = NewTerrain::generate(width, height);
+        Self {
+            content: base64::encode(&raw),
+            width: width as i32,
+            height: height as i32,
+        }
+    }
     fn generate(width: usize, height: usize) -> Vec<u8> {
         let mut rng = rand::thread_rng();
         // 倍率
         let magnification = 2;
-        let width_ = width/magnification;
-        let height_ = height/magnification;
+        let width_ = width / magnification;
+        let height_ = height / magnification;
         let mut raw = Vec::with_capacity(width * height);
         let mut raw_ = Vec::with_capacity(width_ * height_);
         // 陸が現れる確率変数
@@ -64,40 +72,53 @@ impl NewTerrain {
             left_edge = 0;
             right_edge = 0;
             // 上端ならフラグ
-            if i < width_ { top_edge = 1; }
+            if i < width_ {
+                top_edge = 1;
+            }
             // 左端ならフラグ
-            if (i+1) % width_ == 1 { left_edge = 1; }
+            if (i + 1) % width_ == 1 {
+                left_edge = 1;
+            }
             // 右端ならフラグ
-            if (i+1) % width_ == 0 { right_edge = 1; }
+            if (i + 1) % width_ == 0 {
+                right_edge = 1;
+            }
 
-            if top_edge==0 && left_edge==0 && raw_[i-width_-1]==0 { rng_rate += 0.15; }
-            if top_edge==0 && raw_[i-width_]==0 { rng_rate += 0.25; }
-            if top_edge==0 && right_edge==0 && raw_[i-width_+1]==0 { rng_rate += 0.15; }
-            if left_edge==0 && raw_[i-1]==0 { rng_rate += 0.25; }
+            if top_edge == 0 && left_edge == 0 && raw_[i - width_ - 1] == 0 {
+                rng_rate += 0.15;
+            }
+            if top_edge == 0 && raw_[i - width_] == 0 {
+                rng_rate += 0.25;
+            }
+            if top_edge == 0 && right_edge == 0 && raw_[i - width_ + 1] == 0 {
+                rng_rate += 0.15;
+            }
+            if left_edge == 0 && raw_[i - 1] == 0 {
+                rng_rate += 0.25;
+            }
 
             if rng.gen_range(0., 1.) < rng_rate {
                 raw_.push(0);
             } else {
                 raw_.push(1);
             }
-
         }
 
         // rawを拡大(縦*2, 横*2)
-        for h in 1..height_+1 {
+        for h in 1..height_ + 1 {
             // 縦幅が奇数なら最後だけ倍率3倍
             for _ in 0..magnification {
-                for w in 1..width_+1 {
-                    raw.push(raw_[h*w-1]);
-                    raw.push(raw_[h*w-1]);
+                for w in 1..width_ + 1 {
+                    raw.push(raw_[h * w - 1]);
+                    raw.push(raw_[h * w - 1]);
                 }
                 // 横幅が奇数なら最後だけ倍率3倍
-                if width%2==1 {
+                if width % 2 == 1 {
                     raw.push(rng.gen_range(0, 2));
                 }
             }
         }
-        if height%2==1 {
+        if height % 2 == 1 {
             for _ in 0..width {
                 raw.push(rng.gen_range(0, 2));
             }
@@ -117,12 +138,12 @@ impl NewTerrain {
                     rng_rate += 0.3;
                 }
                 // 左端ならフラグ
-                if (j+1) % width == 1 {
+                if (j + 1) % width == 1 {
                     left_edge = 1;
                     rng_rate += 0.1;
                 }
                 // 右端ならフラグ
-                if (j+1) % width == 0 {
+                if (j + 1) % width == 0 {
                     right_edge = 1;
                     rng_rate += 0.1;
                 }
@@ -133,21 +154,37 @@ impl NewTerrain {
                 }
 
                 // 左上
-                if top_edge==0 && left_edge==0 && raw[j-width-1]!=raw[j] {rng_rate += 0.1;}
+                if top_edge == 0 && left_edge == 0 && raw[j - width - 1] != raw[j] {
+                    rng_rate += 0.1;
+                }
                 // 上
-                if top_edge==0 && raw[j-width]!=raw[j] {rng_rate += 0.1;}
+                if top_edge == 0 && raw[j - width] != raw[j] {
+                    rng_rate += 0.1;
+                }
                 // 右上
-                if top_edge==0 && right_edge==0 && raw[j-width+1]!=raw[j] {rng_rate += 0.1;}
+                if top_edge == 0 && right_edge == 0 && raw[j - width + 1] != raw[j] {
+                    rng_rate += 0.1;
+                }
                 // 左
-                if left_edge==0 && raw[j-1]!=raw[j] {rng_rate += 0.1;}
+                if left_edge == 0 && raw[j - 1] != raw[j] {
+                    rng_rate += 0.1;
+                }
                 // 右
-                if right_edge==0 && raw[j+1]!=raw[j] {rng_rate += 0.1;}
+                if right_edge == 0 && raw[j + 1] != raw[j] {
+                    rng_rate += 0.1;
+                }
                 // 左下
-                if bottom_edge==0 && left_edge==0 && raw[j+width-1]!=raw[j] {rng_rate += 0.1;}
+                if bottom_edge == 0 && left_edge == 0 && raw[j + width - 1] != raw[j] {
+                    rng_rate += 0.1;
+                }
                 // 下
-                if bottom_edge==0 && raw[j+width]!=raw[j] {rng_rate += 0.1;}
+                if bottom_edge == 0 && raw[j + width] != raw[j] {
+                    rng_rate += 0.1;
+                }
                 // 右下
-                if bottom_edge==0 && right_edge==0 && raw[j+width+1]!=raw[j] {rng_rate += 0.1;}
+                if bottom_edge == 0 && right_edge == 0 && raw[j + width + 1] != raw[j] {
+                    rng_rate += 0.1;
+                }
 
                 if rng_rate > 0.4 {
                     if raw[j] == 0 {
@@ -164,7 +201,6 @@ impl NewTerrain {
 
 impl std::default::Default for NewTerrain {
     fn default() -> Self {
-
         let mut rng = rand::thread_rng();
         let width = rng.gen_range(40, 81);
         let height = rng.gen_range(40, 81);
@@ -199,7 +235,14 @@ fn create_character() {
     assert_eq!(raw.len(), (new_terrain.width * new_terrain.height) as usize);
     for i in 0..new_terrain.height {
         for j in 0..new_terrain.width {
-            print!("{}", if raw[(i * new_terrain.width + j) as usize] == 0 {"."}else{"#"});
+            print!(
+                "{}",
+                if raw[(i * new_terrain.width + j) as usize] == 0 {
+                    "."
+                } else {
+                    "#"
+                }
+            );
         }
         print!("\n");
     }
