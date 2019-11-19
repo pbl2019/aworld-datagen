@@ -134,7 +134,7 @@ fn main() {
         receiver.socket.local_addr().unwrap(),
     );
 
-    let new_terrain = NewTerrain::default();
+    let new_terrain = NewTerrain::with_size(100, 100);
     let terrain = Terrain {
         id: 0,
         content: new_terrain.content,
