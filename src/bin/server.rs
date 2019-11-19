@@ -36,6 +36,28 @@ impl fmt::Debug for CharacterView {
         )
     }
 }
+
+struct Point2D {
+    pub x: i64,
+    pub y: i64,
+}
+
+struct TerrainView {
+    pub width: i32,
+    pub height: i32,
+    pub origin: Point2D,
+    pub data: Vec<u8>,
+}
+
+impl fmt::Debug for TerrainView {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            r#"{{"width": {}, "height": {}, "origin": {{"x": {}, "y": {}}}, "data": {:?}}}"#,
+            self.width, self.height, self.origin.x, self.origin.y, self.data
+        )
+    }
+}
 // ------------------------------------------ //
 
 struct UdpSender {
@@ -152,6 +174,7 @@ fn main() {
         }
         mutated_entities.retain(|entity| match entity {
             Entity::Character(_) => true,
+            Entity::Terrain(_) => true,
             _ => false,
         });
         if mutated_entities.is_empty() {
@@ -159,6 +182,10 @@ fn main() {
         }
         let mutated_characters: Vec<CharacterView> = mutated_entities
             .iter()
+            .filter(|entity| match entity {
+                Entity::Character(_) => true,
+                _ => false,
+            })
             .map(|entity| match entity {
                 Entity::Character(local) => CharacterView {
                     character_id: local.model.id,
@@ -169,7 +196,31 @@ fn main() {
                 _ => panic!(),
             })
             .collect();
-        let data = format!(r#""characters": {:?}"#, mutated_characters);
+        let mutated_terrain: Vec<TerrainView> = mutated_entities
+            .iter()
+            .filter(|entity| match entity {
+                Entity::Terrain(_) => true,
+                _ => false,
+            })
+            .map(|entity| match entity {
+                Entity::Terrain(local) => TerrainView {
+                    width: local.model.width,
+                    height: local.model.height,
+                    origin: Point2D { x: 0, y: 0 },
+                    data: local.raw.read(),
+                },
+                _ => panic!(),
+            })
+            .collect();
+        let data = format!(
+            r#""terrain": {}, "characters": {:?}"#,
+            if mutated_terrain.len() > 0 {
+                format!("{:?}", mutated_terrain[0])
+            } else {
+                "null".to_owned()
+            },
+            mutated_characters
+        );
         for (connection, character_id) in connection_with_character_ids.into_iter() {
             let buf = format!(r#"{{"character_id": {}, {}}}"#, character_id, data);
             sender.send(&buf, &connection.addr).unwrap_or_else(|e| {

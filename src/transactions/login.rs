@@ -38,7 +38,8 @@ pub fn login(
                             .connection_to_character_id
                             .insert(conn.clone(), character_id);
                         let character = context.characters.get(&character_id).unwrap();
-                        updated.push(character.entity_id);
+                        // updated.push(character.entity_id);
+                        updated.extend_from_slice(&context.get_entity_ids());
                         Ok(updated)
                     } else {
                         Err(format!("Character ID:{:?} is not found", character_id))
@@ -54,7 +55,8 @@ pub fn login(
                 };
                 let character_local = CharacterLocal::from(character);
                 character_local.angle.write(0.0);
-                updated.push(character_local.entity_id);
+                // updated.push(character_local.entity_id);
+                updated.extend_from_slice(&context.get_entity_ids());
                 context
                     .connection_to_character_id
                     .insert(conn.clone(), character_local.model.id);

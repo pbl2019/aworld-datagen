@@ -5,7 +5,7 @@ use crate::models::character::CharacterLocal;
 use crate::models::item::ItemLocal;
 use crate::models::relation::RelationLocal;
 use crate::models::terrain::TerrainLocal;
-use crate::models::Entity;
+use crate::models::{Entity, Object};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
@@ -25,9 +25,9 @@ impl Context {
     pub fn new(terrain: TerrainLocal) -> Self {
         let terrain = Arc::new(terrain);
         let mut entities = HashMap::new();
-        entities.insert(terrain.model.id, terrain.clone());
+        entities.insert(terrain.model.id, Entity::Terrain(terrain.clone()));
         Self {
-            entities: HashMap::new(),
+            entities,
             mutated_entity_ids: HashSet::new(),
             connection_to_character_id: HashMap::new(),
             characters: HashMap::new(),
@@ -76,6 +76,16 @@ impl Context {
         }
         self.entities.insert(entity_id, entity.clone());
     }
+    pub fn get_objects(&self) -> Vec<Object> {
+        let mut objects = Vec::new();
+        for (character_id, character) in self.characters.iter() {
+            objects.push(Object::Character(character.clone()));
+        }
+        for (item_id, item) in self.items.iter() {
+            objects.push(Object::Item(item.clone()));
+        }
+        objects
+    }
     pub fn mark_mutations(&mut self, mutated_entity_ids: Vec<i64>) {
         for id in mutated_entity_ids.into_iter() {
             self.mutated_entity_ids.insert(id);
@@ -86,6 +96,13 @@ impl Context {
         for id in self.mutated_entity_ids.drain() {
             let entity = self.entities.get(&id).unwrap();
             res.push(entity.clone());
+        }
+        res
+    }
+    pub fn get_entity_ids(&self) -> Vec<i64> {
+        let mut res = Vec::new();
+        for (id, _) in self.entities.iter() {
+            res.push(id.clone());
         }
         res
     }
