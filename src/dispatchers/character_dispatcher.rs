@@ -44,6 +44,15 @@ impl CharacterDispatcher {
         store.angle.write(angle);
         Ok(())
     }
+    pub fn action_attack(
+        store: &CharacterLocal,
+        payload: &CharacterTurnRightPayload,
+    ) -> Result<()> {
+        let mut angle = store.angle.read() + payload.angle;
+        
+        store.angle.write(angle);
+        Ok(())
+    }
     pub fn effect_pushed(store: &CharacterLocal, payload: &CharacterPushedPayload) -> Result<()> {
         let x = store.x.read() + store.angle.read().sin() * payload.speed;
         let y = store.y.read() + store.angle.read().cos() * payload.speed;
