@@ -22,7 +22,7 @@ pub struct NewTerrain {
     pub height: i32,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Obstacle {
     Object(ObjectId),
     Terrain(TerrainInfo),
