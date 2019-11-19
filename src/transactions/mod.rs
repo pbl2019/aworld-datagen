@@ -9,6 +9,7 @@ pub mod forward;
 pub mod login;
 pub mod turn_left;
 pub mod turn_right;
+pub mod use;
 
 pub fn call_transaction_with(
     conn: &Connection,
@@ -31,6 +32,12 @@ pub fn call_transaction_with(
             }
             CharacterAction::TurnRight(payload) => {
                 turn_right(conn, context, &payload).and_then(|mutations| {
+                    context.mark_mutations(mutations);
+                    Ok(())
+                })
+            }
+            CharacterAction::Use() => {
+                use(conn, context).and_then(|mutations| {
                     context.mark_mutations(mutations);
                     Ok(())
                 })
