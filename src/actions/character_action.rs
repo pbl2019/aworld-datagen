@@ -5,6 +5,7 @@ pub enum CharacterAction {
     TurnLeft(CharacterTurnLeftPayload),
     TurnRight(CharacterTurnRightPayload),
     Attack,
+    Pickup,
     Use(CharacterUsePayload),
     Defence,
     Avoid,
