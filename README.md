@@ -25,4 +25,8 @@
 cd Documents\GitHub\aworld-datagen\docker   # リポジトリディレクトリのdockerに入る
 docker-compose up -d     # Linux環境(dev)とMySQL立ち上げ
 docker-compose exec dev bash     # Linux環境(dev)に入る
+
+cargo run --bin server --release # ちゃんとした方の起動
+cargo run --release # コントロールサーバ
+kivy src/main.py # クライアント
 ```
