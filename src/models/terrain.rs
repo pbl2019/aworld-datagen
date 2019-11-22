@@ -84,23 +84,23 @@ impl NewTerrain {
                 right_edge = 1;
             }
 
-            if top_edge == 0 && left_edge == 0 && raw_[i - width_ - 1] == 0 {
+            if top_edge == 0 && left_edge == 0 && raw_[i - width_ - 1] == 1 {
                 rng_rate += 0.15;
             }
-            if top_edge == 0 && raw_[i - width_] == 0 {
+            if top_edge == 0 && raw_[i - width_] == 1 {
                 rng_rate += 0.25;
             }
-            if top_edge == 0 && right_edge == 0 && raw_[i - width_ + 1] == 0 {
+            if top_edge == 0 && right_edge == 0 && raw_[i - width_ + 1] == 1 {
                 rng_rate += 0.15;
             }
-            if left_edge == 0 && raw_[i - 1] == 0 {
+            if left_edge == 0 && raw_[i - 1] == 1 {
                 rng_rate += 0.25;
             }
 
             if rng.gen_range(0., 1.) < rng_rate {
-                raw_.push(0);
-            } else {
                 raw_.push(1);
+            } else {
+                raw_.push(0);
             }
         }
 
@@ -238,9 +238,9 @@ fn create_character() {
             print!(
                 "{}",
                 if raw[(i * new_terrain.width + j) as usize] == 0 {
-                    "."
-                } else {
                     "#"
+                } else {
+                    "."
                 }
             );
         }
