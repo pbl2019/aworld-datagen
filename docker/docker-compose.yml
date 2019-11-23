@@ -1,4 +1,4 @@
-version: "3"
+version: "3.6"
 
 services:
   dev:
@@ -7,11 +7,16 @@ services:
     volumes:
       - ..:/app
     tty: true
-    networks:
-      - app-net
     ports:
       - "34254:34254/udp"
       - "34253:34253/udp"
+    working_dir: /app
+    networks:
+      app_net:
+        ipv4_address: 172.16.238.10
+    depends_on:
+      - "mysql"
+    # command: cargo run --bin server --release
 
   mysql:
     container_name: aworld-data-sql
@@ -19,13 +24,16 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "ourworld"
     restart: 'always'
-    expose:
-      - '3306'
     ports:
       - "3306:3306"
     networks:
-      - app-net
+      app_net:
+        ipv4_address: 172.16.238.11
 
 networks:
-  app-net:
-    driver: bridge
+  app_net:
+    name: back_end_net
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"

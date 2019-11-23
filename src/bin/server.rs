@@ -125,8 +125,8 @@ impl UdpReceiver {
 
 fn main() {
     let queue = Arc::new(RwLock::new(VecDeque::new()));
-    let mut receiver = UdpReceiver::new("127.0.0.1:34254", queue.clone()).unwrap();
-    let sender = UdpSender::new("127.0.0.1:34249").unwrap();
+    let mut receiver = UdpReceiver::new("0.0.0.0:34254", queue.clone()).unwrap();
+    let sender = UdpSender::new("0.0.0.0:34249").unwrap();
 
     println!(
         "Aworld Data server v{} has started on {:?}",
