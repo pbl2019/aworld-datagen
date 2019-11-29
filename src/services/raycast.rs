@@ -1,23 +1,25 @@
 use crate::context::Context;
 use crate::models::terrain::*;
 use crate::models::{Object, ObjectId};
+use crate::utils::intersects_circle_with_line;
 
 impl Context {
     pub fn raycast(&self, x0: f32, y0: f32, angle: f32, distance: f32) -> Option<Obstacle> {
         let x1 = x0 + distance * angle.cos();
         let y1 = y0 + distance * angle.sin();
-        let object_ids = self.terrain.object_ids.read();
-        let objects = self.fetch_objects(object_ids);
+        // let object_ids = self.terrain.object_ids.read();
+        // let objects = self.fetch_objects(object_ids);
+        let objects = self.get_objects();
+        println!("{:?}", objects);
         let mut objects = objects
             .iter()
             .map(|object| match object {
                 Object::Character(local) => {
                     let x2 = local.x.read();
                     let y2 = local.y.read();
-                    let pos_to_eye = ((x2 - x0).powf(2.0) + (y2 - y0).powf(2.0)).sqrt();
-                    let cross = (x1 - x0) * (x2 - x0) + (y1 - y0) * (y2 - y0);
-                    if (cross - pos_to_eye).abs() < 0.001 && distance >= pos_to_eye {
-                        Some((ObjectId::Character(local.model.id), pos_to_eye))
+                    if let Some(d) = intersects_circle_with_line(x2, y2, 1.0, x0, y0, x1, y1) {
+                        println!("distance: {}", d);
+                        Some((ObjectId::Character(local.model.id), d))
                     } else {
                         None
                     }

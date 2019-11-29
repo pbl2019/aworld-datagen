@@ -27,6 +27,7 @@ pub fn query_to_action(query: &Query) -> Result<Action, String> {
             let payload = TryFrom::try_from(&query.payload).unwrap();
             Ok(Action::Character(CharacterAction::TurnRight(payload)))
         }
+        QueryKind::Pickup => Ok(Action::Character(CharacterAction::Pickup)),
         _ => Err(format!("Cannot convert query {:?} to action", query.kind)),
     }
 }

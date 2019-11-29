@@ -20,6 +20,8 @@ impl Context {
         }
     }
     pub fn fetch_objects(&self, ids: Vec<ObjectId>) -> Vec<Object> {
+        println!("{:?}", ids);
+        println!("{:?}", self.characters);
         ids.iter().map(|id| self.fetch_object(*id)).collect()
     }
 }

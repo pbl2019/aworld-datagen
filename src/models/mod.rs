@@ -21,7 +21,7 @@ pub enum EntityId {
     Relation(i64),
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Object {
     Character(Arc<character::CharacterLocal>),
     Item(Arc<item::ItemLocal>),
