@@ -36,8 +36,8 @@ pub fn call_transaction_with(
                     Ok(())
                 })
             }
-            CharacterAction::Attack(payload) => {
-                attack(conn, context, &payload).and_then(|mutations| {
+            CharacterAction::Attack => {
+                attack(conn, context).and_then(|mutations| {
                     context.mark_mutations(mutations);
                     Ok(())
                 })
