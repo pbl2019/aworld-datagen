@@ -19,12 +19,25 @@ impl Context {
                     let y2 = local.y.read();
                     if let Some(d) = intersects_circle_with_line(x2, y2, 10.0, x0, y0, x1, y1) {
                         println!("distance: {}", d);
-                        Some((ObjectId::Character(local.model.id), d))
+                        Some((ObjectId::Character(local.entity_id), d))
                     } else {
                         None
                     }
                 }
-                Object::Item(_local) => unimplemented!(),
+                Object::Item(local) => {
+                    if local.is_dropped.read() {
+                        let x2 = local.x.read();
+                        let y2 = local.y.read();
+                        if let Some(d) = intersects_circle_with_line(x2, y2, 10.0, x0, y0, x1, y1) {
+                            println!("item distance: {}", d);
+                            Some((ObjectId::Item(local.entity_id), d))
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                }
             })
             .collect::<Vec<Option<(ObjectId, f32)>>>();
         objects.retain(|op| op.is_some());

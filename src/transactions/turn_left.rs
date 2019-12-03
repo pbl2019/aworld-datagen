@@ -8,7 +8,7 @@ pub fn turn_left(
     conn: &Connection,
     context: &mut Context,
     payload: &CharacterTurnLeftPayload,
-) -> Result<Vec<i64>, String> {
+) -> Result<Vec<u64>, String> {
     let mut updated = Vec::new();
     context
         .get_character_from_connection(conn)

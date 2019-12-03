@@ -1,9 +1,9 @@
+use crate::counter::get_count;
 use crate::init_field;
 use crate::models::field::Field;
 use crate::models::ObjectId;
 use crate::schema::terrains;
 use base64;
-use chrono::Utc;
 use rand::Rng;
 
 #[derive(Queryable, Clone, Debug)]
@@ -36,7 +36,7 @@ pub enum TerrainInfo {
 
 #[derive(Debug)]
 pub struct TerrainLocal {
-    pub entity_id: i64,
+    pub entity_id: u64,
     pub model: Terrain,
 
     pub raw: Field<Vec<u8>>,
@@ -218,7 +218,7 @@ impl std::convert::From<Terrain> for TerrainLocal {
     fn from(model: Terrain) -> Self {
         let raw = base64::decode(&model.content).unwrap();
         Self {
-            entity_id: Utc::now().timestamp(),
+            entity_id: get_count(),
             model: model.clone(),
 
             raw: init_field!(raw),

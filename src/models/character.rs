@@ -1,8 +1,8 @@
+use crate::counter::get_count;
 use crate::init_field;
 use crate::models::field::Field;
 use crate::schema::characters;
 use crate::utils::generate_random_name;
-use chrono::Utc;
 use rand::Rng;
 
 #[derive(Queryable, Clone, Debug)]
@@ -23,7 +23,7 @@ pub struct NewCharacter {
 
 #[derive(Debug)]
 pub struct CharacterLocal {
-    pub entity_id: i64,
+    pub entity_id: u64,
     pub model: Character,
 
     pub hp: Field<i32>,
@@ -33,7 +33,7 @@ pub struct CharacterLocal {
     pub angle: Field<f32>,
     pub is_dead: Field<bool>,
     pub sleep_state: Field<Sleeping>,
-    pub items: Field<Vec<i64>>,
+    pub items: Field<Vec<u64>>,
 }
 
 #[derive(Debug, Clone)]
@@ -71,7 +71,7 @@ impl std::convert::From<Character> for CharacterLocal {
             depth: 0,
         };
         Self {
-            entity_id: Utc::now().timestamp(),
+            entity_id: get_count(),
             model: model.clone(),
             hp: init_field!(model.max_hp),
             appetite: init_field!(model.max_appetite),
@@ -80,7 +80,7 @@ impl std::convert::From<Character> for CharacterLocal {
             angle: init_field!(rng.gen_range(0., 2. * std::f64::consts::PI as f32)),
             is_dead: init_field!(false),
             sleep_state: init_field!(sleep),
-            items: init_field!(Vec::new())
+            items: init_field!(Vec::new()),
         }
     }
 }

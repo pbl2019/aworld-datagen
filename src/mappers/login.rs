@@ -12,7 +12,7 @@ impl std::convert::TryFrom<&Value> for SystemLoginPayload {
                 let mut password = None;
                 if let Some(cid) = map.get("character_id") {
                     if cid.is_i64() {
-                        character_id = Some(cid.as_i64().unwrap());
+                        character_id = Some(cid.as_u64().unwrap());
                     }
                 }
                 if let Some(pw) = map.get("password") {

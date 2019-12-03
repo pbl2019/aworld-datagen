@@ -3,6 +3,7 @@ use aworld_datagen::actions::Action;
 use aworld_datagen::connection::Connection;
 use aworld_datagen::context::Context;
 use aworld_datagen::mappers::query_to_action;
+use aworld_datagen::models::item::*;
 use aworld_datagen::models::{terrain::*, Entity};
 use aworld_datagen::query::*;
 use aworld_datagen::transactions::call_transaction_with;
@@ -21,7 +22,7 @@ type ActionQueue = VecDeque<(String, i64, Action)>;
 // TODO: クライアントへ送るjsonのシリアライズ
 // TODO: もっとマシな方法を考える
 struct CharacterView {
-    pub character_id: i64,
+    pub character_id: u64,
     pub x: f32,
     pub y: f32,
     pub angle: f32,
@@ -55,6 +56,23 @@ impl fmt::Debug for TerrainView {
             f,
             r#"{{"width": {}, "height": {}, "origin": {{"x": {}, "y": {}}}, "data": {:?}}}"#,
             self.width, self.height, self.origin.x, self.origin.y, self.data
+        )
+    }
+}
+
+struct ItemView {
+    pub item_id: u64,
+    pub x: f32,
+    pub y: f32,
+    pub is_dropped: bool,
+}
+
+impl fmt::Debug for ItemView {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            r#"{{"item_id": {}, "x": {}, "y": {}, "is_dropped": {}}}"#,
+            self.item_id, self.x, self.y, self.is_dropped
         )
     }
 }
@@ -143,6 +161,22 @@ fn main() {
     };
     let terrain_local = TerrainLocal::from(terrain);
     let context = Arc::new(RwLock::new(Context::new(terrain_local)));
+    {
+        let new_item = NewItem::default();
+        let item = Item {
+            id: 1,
+            name: new_item.name,
+            item_type: new_item.item_type,
+            amount: new_item.amount,
+        };
+        let item_local = ItemLocal::from(item);
+        item_local.x.write(100.0);
+        item_local.y.write(100.0);
+        context
+            .write()
+            .unwrap()
+            .insert_entity(Entity::Item(Arc::new(item_local)));
+    }
     let context2 = context.clone();
 
     thread::spawn(move || {
@@ -162,7 +196,7 @@ fn main() {
     let mut now = Instant::now();
     thread::spawn(move || loop {
         let mut mutated_entities;
-        let connection_with_character_ids: Vec<(Connection, i64)>;
+        let connection_with_character_ids: Vec<(Connection, u64)>;
         {
             let mut lock = context2.write().unwrap();
             mutated_entities = lock.get_mutated_entities();
@@ -175,6 +209,7 @@ fn main() {
         mutated_entities.retain(|entity| match entity {
             Entity::Character(_) => true,
             Entity::Terrain(_) => true,
+            Entity::Item(_) => true,
             _ => false,
         });
         if mutated_entities.is_empty() {
@@ -188,7 +223,7 @@ fn main() {
             })
             .map(|entity| match entity {
                 Entity::Character(local) => CharacterView {
-                    character_id: local.model.id,
+                    character_id: local.entity_id,
                     x: local.x.read(),
                     y: local.y.read(),
                     angle: local.angle.read(),
@@ -212,14 +247,31 @@ fn main() {
                 _ => panic!(),
             })
             .collect();
+        let mutated_items: Vec<ItemView> = mutated_entities
+            .iter()
+            .filter(|entity| match entity {
+                Entity::Item(_) => true,
+                _ => false,
+            })
+            .map(|entity| match entity {
+                Entity::Item(local) => ItemView {
+                    item_id: local.entity_id,
+                    x: local.x.read(),
+                    y: local.y.read(),
+                    is_dropped: local.is_dropped.read(),
+                },
+                _ => panic!(),
+            })
+            .collect();
         let data = format!(
-            r#""terrain": {}, "characters": {:?}"#,
+            r#""terrain": {}, "characters": {:?}, "items": {:?}"#,
             if mutated_terrain.len() > 0 {
                 format!("{:?}", mutated_terrain[0])
             } else {
                 "null".to_owned()
             },
-            mutated_characters
+            mutated_characters,
+            mutated_items,
         );
         for (connection, character_id) in connection_with_character_ids.into_iter() {
             let buf = format!(r#"{{"character_id": {}, {}}}"#, character_id, data);

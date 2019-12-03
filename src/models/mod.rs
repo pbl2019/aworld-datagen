@@ -7,18 +7,20 @@ pub mod item;
 pub mod relation;
 pub mod terrain;
 
+pub type entity_id = u64;
+
 #[derive(Copy, Clone, Debug)]
 pub enum ObjectId {
-    Character(i64),
-    Item(i64),
+    Character(u64),
+    Item(u64),
 }
 
 #[derive(Copy, Clone, Debug)]
 pub enum EntityId {
-    Character(i64),
-    Item(i64),
-    Terrain(i64),
-    Relation(i64),
+    Character(u64),
+    Item(u64),
+    Terrain(u64),
+    Relation(u64),
 }
 
 #[derive(Clone, Debug)]

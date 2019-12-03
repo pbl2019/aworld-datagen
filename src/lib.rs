@@ -7,6 +7,7 @@ extern crate num_derive;
 pub mod actions;
 pub mod connection;
 pub mod context;
+pub mod counter;
 pub mod dispatchers;
 pub mod mappers;
 pub mod models;

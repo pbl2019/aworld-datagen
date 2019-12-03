@@ -10,7 +10,7 @@ pub fn login(
     conn: &Connection,
     context: &mut Context,
     payload: &SystemLoginPayload,
-) -> Result<Vec<i64>, String> {
+) -> Result<Vec<u64>, String> {
     let mut updated = Vec::new();
     match context.get_character_from_connection(conn) {
         Ok(character) => Err(format!(
@@ -32,7 +32,7 @@ pub fn login(
                     if context
                         .characters
                         .iter()
-                        .any(|(_, local)| local.model.id == character_id)
+                        .any(|(_, local)| local.entity_id == character_id)
                     {
                         context
                             .connection_to_character_id
@@ -59,7 +59,7 @@ pub fn login(
                 updated.extend_from_slice(&context.get_entity_ids());
                 context
                     .connection_to_character_id
-                    .insert(conn.clone(), character_local.model.id);
+                    .insert(conn.clone(), character_local.entity_id);
                 context.insert_entity(Entity::Character(Arc::new(character_local)));
                 Ok(updated)
             }

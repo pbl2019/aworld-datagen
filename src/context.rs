@@ -9,12 +9,12 @@ use crate::models::{Entity, Object};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-pub type Repository<T> = HashMap<i64, Arc<T>>;
+pub type Repository<T> = HashMap<u64, Arc<T>>;
 
 pub struct Context {
-    entities: HashMap<i64, Entity>,
-    mutated_entity_ids: HashSet<i64>,
-    pub connection_to_character_id: HashMap<Connection, i64>,
+    entities: HashMap<u64, Entity>,
+    mutated_entity_ids: HashSet<u64>,
+    pub connection_to_character_id: HashMap<Connection, u64>,
     pub characters: Repository<CharacterLocal>,
     pub items: Repository<ItemLocal>,
     pub relations: Repository<RelationLocal>,
@@ -25,7 +25,7 @@ impl Context {
     pub fn new(terrain: TerrainLocal) -> Self {
         let terrain = Arc::new(terrain);
         let mut entities = HashMap::new();
-        entities.insert(terrain.model.id, Entity::Terrain(terrain.clone()));
+        entities.insert(terrain.entity_id, Entity::Terrain(terrain.clone()));
         Self {
             entities,
             mutated_entity_ids: HashSet::new(),
@@ -53,11 +53,11 @@ impl Context {
         let entity_id;
         match entity.clone() {
             Entity::Character(local) => {
-                self.characters.insert(local.model.id, local.clone());
+                self.characters.insert(local.entity_id, local.clone());
                 entity_id = local.entity_id;
             }
             Entity::Item(local) => {
-                self.items.insert(local.model.id, local.clone());
+                self.items.insert(local.entity_id, local.clone());
                 entity_id = local.entity_id;
             }
             Entity::Terrain(local) => {
@@ -65,13 +65,13 @@ impl Context {
                 entity_id = local.entity_id;
             }
             Entity::Relation(local) => {
-                self.relations.insert(local.model.id, local.clone());
+                self.relations.insert(local.entity_id, local.clone());
                 entity_id = local.entity_id;
             }
         }
         // TODO: Remove here if secure
         if let Some(_) = self.entities.get(&entity_id) {
-            log!("BUG", "Same entity id has been found");
+            log!("BUG", "Same entity id {} has been found", entity_id);
             panic!("same entity id has been found");
         }
         self.entities.insert(entity_id, entity.clone());
@@ -86,7 +86,7 @@ impl Context {
         }
         objects
     }
-    pub fn mark_mutations(&mut self, mutated_entity_ids: Vec<i64>) {
+    pub fn mark_mutations(&mut self, mutated_entity_ids: Vec<u64>) {
         for id in mutated_entity_ids.into_iter() {
             self.mutated_entity_ids.insert(id);
         }
@@ -99,7 +99,7 @@ impl Context {
         }
         res
     }
-    pub fn get_entity_ids(&self) -> Vec<i64> {
+    pub fn get_entity_ids(&self) -> Vec<u64> {
         let mut res = Vec::new();
         for (id, _) in self.entities.iter() {
             res.push(id.clone());

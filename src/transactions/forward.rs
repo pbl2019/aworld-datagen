@@ -10,7 +10,7 @@ pub fn forward(
     conn: &Connection,
     context: &mut Context,
     payload: &CharacterForwardPayload,
-) -> Result<Vec<i64>, String> {
+) -> Result<Vec<u64>, String> {
     let mut updated = Vec::new();
     context
         .get_character_from_connection(conn)
@@ -19,12 +19,14 @@ pub fn forward(
             let y = character.y.read();
             let angle = character.angle.read();
             let speed = payload.speed;
+            let mut is_ignore_obstacle = true;
             if let Some(obstacle) = context.raycast(x, y, angle, speed) {
                 match obstacle {
                     Obstacle::Object(object_id) => match object_id {
                         ObjectId::Character(character_id) => {
                             let pushee = context.characters.get(&character_id).unwrap();
                             let pushed_payload = CharacterPushedPayload { angle, speed };
+                            is_ignore_obstacle = false;
                             CharacterDispatcher::effect_pushed(&pushee, &pushed_payload)
                                 .and_then(|_| {
                                     updated.push(pushee.entity_id);
@@ -32,13 +34,17 @@ pub fn forward(
                                 })
                                 .unwrap_or_else(|e| err!("{:?}", e));
                         }
-                        ObjectId::Item(_item_id) => unimplemented!(),
+                        ObjectId::Item(item_id) => {
+                            dbg!("{} moved over an item<{}>", character.model.name, item_id);
+                        }
                     },
                     Obstacle::Terrain(info) => {
+                        is_ignore_obstacle = false;
                         dbg!("{} tackled to {:?}", character.model.name, info);
                     }
                 }
-            } else {
+            }
+            if is_ignore_obstacle {
                 CharacterDispatcher::action_forward(&character, payload)
                     .and_then(|_| {
                         updated.push(character.entity_id);

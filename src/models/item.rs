@@ -1,9 +1,9 @@
 #![allow(unused_imports)]
+use crate::counter::get_count;
 use crate::models::field::Field;
 use crate::schema::items;
 use crate::utils::generate_random_name;
 use crate::{define_enum, init_field};
-use chrono::Utc;
 use num_traits::{FromPrimitive, ToPrimitive};
 use rand::Rng;
 
@@ -34,12 +34,15 @@ pub struct NewItem {
 
 #[derive(Debug)]
 pub struct ItemLocal {
-    pub entity_id: i64,
+    pub entity_id: u64,
     pub model: Item,
 
     pub is_used: Field<bool>,
     pub max_durability: Field<i64>, // NOTE: アイテム毎で耐久度が異なる
     pub durability: Field<i64>,
+    pub is_dropped: Field<bool>,
+    pub x: Field<f32>,
+    pub y: Field<f32>,
 }
 
 impl std::default::Default for NewItem {
@@ -58,11 +61,14 @@ impl std::convert::From<Item> for ItemLocal {
         let mut rng = rand::thread_rng();
         let max_durability = rng.gen_range(10, 1000);
         Self {
-            entity_id: Utc::now().timestamp(),
+            entity_id: get_count(),
             model: model.clone(),
             is_used: init_field!(false),
             max_durability: init_field!(max_durability),
             durability: init_field!(max_durability),
+            is_dropped: init_field!(true),
+            x: init_field!(0.0),
+            y: init_field!(0.0),
         }
     }
 }

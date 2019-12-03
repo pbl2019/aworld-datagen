@@ -5,6 +5,6 @@ pub enum SystemAction {
 
 #[derive(Debug)]
 pub struct SystemLoginPayload {
-    pub character_id: Option<i64>,
+    pub character_id: Option<u64>,
     pub password: Option<String>,
 }
