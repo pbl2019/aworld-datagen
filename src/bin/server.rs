@@ -26,14 +26,15 @@ struct CharacterView {
     pub x: f32,
     pub y: f32,
     pub angle: f32,
+    pub items: Vec<u64>,
 }
 
 impl fmt::Debug for CharacterView {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"{{"character_id": {}, "x": {}, "y": {}, "angle": {}}}"#,
-            self.character_id, self.x, self.y, self.angle
+            r#"{{"character_id": {}, "x": {}, "y": {}, "angle": {}, "items": {:?}}}"#,
+            self.character_id, self.x, self.y, self.angle, self.items
         )
     }
 }
@@ -62,6 +63,7 @@ impl fmt::Debug for TerrainView {
 
 struct ItemView {
     pub item_id: u64,
+    pub name: String,
     pub x: f32,
     pub y: f32,
     pub is_dropped: bool,
@@ -71,8 +73,8 @@ impl fmt::Debug for ItemView {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"{{"item_id": {}, "x": {}, "y": {}, "is_dropped": {}}}"#,
-            self.item_id, self.x, self.y, self.is_dropped
+            r#"{{"item_id": {}, "name": {:?}, "x": {}, "y": {}, "is_dropped": {}}}"#,
+            self.item_id, self.name, self.x, self.y, self.is_dropped
         )
     }
 }
@@ -227,6 +229,7 @@ fn main() {
                     x: local.x.read(),
                     y: local.y.read(),
                     angle: local.angle.read(),
+                    items: local.items.read(),
                 },
                 _ => panic!(),
             })
@@ -256,6 +259,7 @@ fn main() {
             .map(|entity| match entity {
                 Entity::Item(local) => ItemView {
                     item_id: local.entity_id,
+                    name: local.model.name.clone(),
                     x: local.x.read(),
                     y: local.y.read(),
                     is_dropped: local.is_dropped.read(),
