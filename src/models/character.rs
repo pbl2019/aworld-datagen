@@ -33,6 +33,7 @@ pub struct CharacterLocal {
     pub angle: Field<f32>,
     pub is_dead: Field<bool>,
     pub sleep_state: Field<Sleeping>,
+    pub items: Field<Vec<i64>>,
 }
 
 #[derive(Debug, Clone)]
@@ -79,6 +80,7 @@ impl std::convert::From<Character> for CharacterLocal {
             angle: init_field!(rng.gen_range(0., 2. * std::f64::consts::PI as f32)),
             is_dead: init_field!(false),
             sleep_state: init_field!(sleep),
+            items: init_field!(Vec::new())
         }
     }
 }
