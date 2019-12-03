@@ -17,7 +17,7 @@ impl Context {
                 Object::Character(local) => {
                     let x2 = local.x.read();
                     let y2 = local.y.read();
-                    if let Some(d) = intersects_circle_with_line(x2, y2, 1.0, x0, y0, x1, y1) {
+                    if let Some(d) = intersects_circle_with_line(x2, y2, 10.0, x0, y0, x1, y1) {
                         println!("distance: {}", d);
                         Some((ObjectId::Character(local.model.id), d))
                     } else {

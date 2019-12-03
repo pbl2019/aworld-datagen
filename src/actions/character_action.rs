@@ -47,7 +47,7 @@ pub struct CharacterTurnRightPayload {
 
 #[derive(Debug)]
 pub struct CharacterUsePayload {
-    pub item_id: String,
+    pub item_index: i64,
 }
 
 #[derive(Debug)]
