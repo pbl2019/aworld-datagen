@@ -1,7 +1,9 @@
 use crate::actions::character_action::CharacterUsePayload;
+use crate::actions::character_action::CharacterGetFullPayload;
 use crate::connection::Connection;
 use crate::context::Context;
 use crate::dispatchers::character_dispatcher::CharacterDispatcher;
+use crate::dispatchers::item_dispatcher::ItemDispatcher
 use crate::models::item::*;
 use crate::err;
 
@@ -21,12 +23,18 @@ pub fn use_item(
                             match local.model.item_type {
                                 ItemType::Unknown => unimplemented!()
                                 ItemType::Food => {
-                                    CharacterDispatcher::effect_recovery(&character, &payload)
-                                    .and_then(|_| {
-                                        updated.push(character.entity_id);
-                                        Ok(())
-                                    })
-                                    .unwrap_or_else(|e| err!("{:?}", e));
+                                    let get_full_payload = CharacterPushedPayload { local.model.amount };
+                                    CharacterDispatcher::effect_get_full(&character, &get_full_payload)
+                                        .and_then(|_| {
+                                            updated.push(character.entity_id);
+                                            ItemDispatcher::effect_spend(local);
+                                                .and_then(|_| {
+                                                    updated.push(local.entity_id);
+                                                    Ok(())
+                                                })
+                                                .unwrap_or_else(|e| err!("{:?}", e));
+                                        })
+                                        .unwrap_or_else(|e| err!("{:?}", e));
                                 }
                                 ItemType::Weapon => unimplemented!()
                             }

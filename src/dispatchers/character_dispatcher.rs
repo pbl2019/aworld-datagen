@@ -120,6 +120,14 @@ impl CharacterDispatcher {
         store.sleep_state.write(sleep_state);
         Ok(())
     }
+    pub fn effect_get_full(
+        store: &CharacterLocal,
+        payload: &CharacterGetFullPayload,
+    ) -> Result<()> {
+        let appetite = store.appetite.read() + payload.amount;
+        store.appetite.write(appetite);
+        Ok(())
+    }
 }
 
 #[test]
