@@ -23,6 +23,7 @@ pub enum CharacterEffect {
     Recovery(CharacterRecoveryPayload),
     WakeUp,
     Disturb,
+    GetFull,
 }
 
 #[derive(Debug)]
@@ -64,4 +65,9 @@ pub struct CharacterDamagedPayload {
 #[derive(Debug)]
 pub struct CharacterRecoveryPayload {
     pub depth: i32,
+}
+
+#[derive(Debug)]
+pub struct CharacterGetFullPayload {
+    pub amount: i32,
 }
