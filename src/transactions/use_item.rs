@@ -26,6 +26,7 @@ pub fn use_item(
                                     let get_full_payload = CharacterPushedPayload { local.model.amount };
                                     CharacterDispatcher::effect_get_full(&character, &get_full_payload)
                                         .and_then(|_| {
+                                            updated.push(character.entity_id);
                                             ItemDispatcher::effect_spend(local);
                                                 .and_then(|_| {
                                                     updated.push(local.entity_id);
