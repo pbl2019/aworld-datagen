@@ -1,11 +1,13 @@
 #![allow(dead_code)]
 use aworld_datagen::actions::Action;
+use aworld_datagen::batches::hunger::*;
 use aworld_datagen::connection::Connection;
 use aworld_datagen::context::Context;
 use aworld_datagen::mappers::query_to_action;
 use aworld_datagen::models::item::*;
 use aworld_datagen::models::{terrain::*, Entity};
 use aworld_datagen::query::*;
+use aworld_datagen::schedule::*;
 use aworld_datagen::transactions::call_transaction_with;
 use aworld_datagen::{dbg, err, log};
 use std::collections::VecDeque;
@@ -180,6 +182,7 @@ fn main() {
             .insert_entity(Entity::Item(Arc::new(item_local)));
     }
     let context2 = context.clone();
+    let context3 = context.clone();
 
     thread::spawn(move || {
         // TODO: データ投入
@@ -286,6 +289,24 @@ fn main() {
         }
         now = Instant::now();
         sleep(Duration::new(0, 5 * 1000 * 1000)); // NOTE: 5msスリープ
+    });
+    thread::spawn(move || {
+        let mut now = Instant::now();
+        let mut schedules = make_schedules();
+        loop {
+            {
+                for schedule in &mut schedules {
+                    let mut lock = context3.write().unwrap();
+                    schedule.exec(&mut lock).map(|res| {
+                        res.and_then(|mutations| {
+                            lock.mark_mutations(mutations);
+                            Ok(())
+                        })
+                        .unwrap();
+                    });
+                }
+            }
+        }
     });
     receiver.start().unwrap();
 }
