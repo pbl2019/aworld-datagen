@@ -28,6 +28,9 @@ struct CharacterView {
     pub x: f32,
     pub y: f32,
     pub angle: f32,
+    pub hp: i32,
+    pub appetite: i32,
+    pub is_dead: bool,
     pub items: Vec<u64>,
 }
 
@@ -35,8 +38,8 @@ impl fmt::Debug for CharacterView {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"{{"character_id": {}, "x": {}, "y": {}, "angle": {}, "items": {:?}}}"#,
-            self.character_id, self.x, self.y, self.angle, self.items
+            r#"{{"character_id": {}, "x": {}, "y": {}, "angle": {}, "hp": {}, "appetite": {}, "is_dead": {}, "items": {:?}}}"#,
+            self.character_id, self.x, self.y, self.angle, self.hp, self.appetite, self.is_dead, self.items
         )
     }
 }
@@ -232,6 +235,9 @@ fn main() {
                     x: local.x.read(),
                     y: local.y.read(),
                     angle: local.angle.read(),
+                    hp: local.hp.read(),
+                    appetite: local.appetite.read(),
+                    is_dead: local.is_dead.read(),
                     items: local.items.read(),
                 },
                 _ => panic!(),
