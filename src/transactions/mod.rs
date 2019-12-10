@@ -3,7 +3,7 @@ use crate::connection::Connection;
 use crate::context::Context;
 use crate::transactions::{
     attack::attack, forward::forward, login::login, pickup::pickup, turn_left::turn_left,
-    turn_right::turn_right,
+    turn_right::turn_right, use_item::use_item,
 };
 
 pub mod attack;
@@ -12,6 +12,7 @@ pub mod login;
 pub mod pickup;
 pub mod turn_left;
 pub mod turn_right;
+pub mod use_item;
 
 pub fn call_transaction_with(
     conn: &Connection,
@@ -46,6 +47,12 @@ pub fn call_transaction_with(
                 context.mark_mutations(mutations);
                 Ok(())
             }),
+            CharacterAction::Use(payload) => {
+                use_item(conn, context, &payload).and_then(|mutations| {
+                    context.mark_mutations(mutations);
+                    Ok(())
+                })
+            }
             _ => Err(format!("Action {:?} is not implemented", character_action)),
         },
         Action::System(system_action) => match system_action {

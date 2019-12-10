@@ -12,7 +12,7 @@ table! {
         id -> Bigint,
         name -> Char,
         item_type -> Integer,
-        amount -> Bigint,
+        amount -> Integer,
     }
 }
 
@@ -34,9 +34,4 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(
-    characters,
-    items,
-    relations,
-    terrains,
-);
+allow_tables_to_appear_in_same_query!(characters, items, relations, terrains,);

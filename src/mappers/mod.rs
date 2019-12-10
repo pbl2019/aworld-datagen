@@ -7,6 +7,7 @@ mod forward;
 mod login;
 mod turn_left;
 mod turn_right;
+mod use_item;
 
 pub fn query_to_action(query: &Query) -> Result<Action, String> {
     match query.kind {
@@ -28,6 +29,8 @@ pub fn query_to_action(query: &Query) -> Result<Action, String> {
             Ok(Action::Character(CharacterAction::TurnRight(payload)))
         }
         QueryKind::Pickup => Ok(Action::Character(CharacterAction::Pickup)),
+        QueryKind::UseItem => TryFrom::try_from(&query.payload)
+            .and_then(|payload| Ok(Action::Character(CharacterAction::Use(payload)))),
         _ => Err(format!("Cannot convert query {:?} to action", query.kind)),
     }
 }

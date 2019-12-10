@@ -10,6 +10,7 @@ pub enum QueryKind {
     TurnLeft,
     TurnRight,
     Pickup,
+    UseItem,
     Unknown(String),
 }
 
@@ -27,6 +28,7 @@ impl<'de> serde::Deserialize<'de> for QueryKind {
             "turn_left" => QueryKind::TurnLeft,
             "turn_right" => QueryKind::TurnRight,
             "pickup" => QueryKind::Pickup,
+            "use_item" => QueryKind::UseItem,
             _ => QueryKind::Unknown(s),
         })
     }

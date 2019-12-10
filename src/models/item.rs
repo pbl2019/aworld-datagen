@@ -21,7 +21,7 @@ pub struct Item {
     pub id: i64,
     pub name: String,
     pub item_type: ItemType,
-    pub amount: i64,
+    pub amount: i32,
 }
 
 #[derive(Insertable)]
@@ -29,7 +29,7 @@ pub struct Item {
 pub struct NewItem {
     pub name: String,
     pub item_type: ItemType,
-    pub amount: i64,
+    pub amount: i32,
 }
 
 #[derive(Debug)]
