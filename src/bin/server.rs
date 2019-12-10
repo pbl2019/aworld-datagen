@@ -169,11 +169,12 @@ fn main() {
     let terrain_local = TerrainLocal::from(terrain);
     let context = Arc::new(RwLock::new(Context::new(terrain_local)));
     {
+        use aworld_datagen::models::item::ItemType;
         let new_item = NewItem::default();
         let item = Item {
             id: 1,
             name: new_item.name,
-            item_type: new_item.item_type,
+            item_type: ItemType::Food,
             amount: new_item.amount,
         };
         let item_local = ItemLocal::from(item);
