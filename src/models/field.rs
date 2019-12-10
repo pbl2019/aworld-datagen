@@ -42,7 +42,7 @@ impl<T: Clone + std::fmt::Debug> Field<T> {
     }
     pub fn read(&self) -> T {
         let latest = self.data.read().unwrap().clone();
-        log!("READ", "<{:p}: {:?}>", self, latest);
+        // log!("READ", "<{:p}: {:?}>", self, latest);
         latest
     }
 }

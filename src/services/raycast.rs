@@ -10,7 +10,6 @@ impl Context {
         // let object_ids = self.terrain.object_ids.read();
         // let objects = self.fetch_objects(object_ids);
         let objects = self.get_objects();
-        println!("{:?}", objects);
         let mut objects = objects
             .iter()
             .map(|object| match object {
@@ -43,7 +42,43 @@ impl Context {
         objects.retain(|op| op.is_some());
         let mut objects: Vec<(ObjectId, f32)> = objects.into_iter().map(|op| op.unwrap()).collect();
         objects.sort_by(|(_, d1), (_, d2)| d1.partial_cmp(d2).unwrap());
-        objects.first().map(|ob| Obstacle::Object(ob.0))
-        // TODO: Terrainとの当たり判定
+        let mut obstacles: Vec<(Obstacle, f32)> = Vec::new();
+        if let Some(ob) = objects.first() {
+            obstacles.push((Obstacle::Object(ob.0), ob.1))
+        }
+        {
+            let num_iter = distance * 10.0 + 1.0;
+            let delta_x = (x1 - x0) / num_iter;
+            let delta_y = (y1 - y0) / num_iter;
+            let mut cur_x = x0;
+            let mut cur_y = y0;
+            let width = self.terrain.model.width as usize;
+            let height = self.terrain.model.height as usize;
+            let raw = self.terrain.raw.read();
+            for i in 0..(num_iter as usize) + 1 {
+                let ix = cur_x.floor() as usize;
+                let iy = cur_y.floor() as usize;
+                if raw[ix + iy * width] == TerrainInfo::Wall as u8 {
+                    obstacles.push((
+                        Obstacle::Terrain(TerrainInfo::Wall),
+                        ((x0 - cur_x).powi(2) + (y0 - cur_y).powi(2)).sqrt(),
+                    ));
+                    break;
+                }
+                cur_x += delta_x;
+                cur_y += delta_y;
+            }
+            let ix = x1.floor() as usize;
+            let iy = y1.floor() as usize;
+            println!("move to {}, {}", ix, iy);
+            if raw[ix + iy * width] == TerrainInfo::Wall as u8 {
+                obstacles.push((
+                    Obstacle::Terrain(TerrainInfo::Wall),
+                    ((x0 - x1).powi(2) + (y0 - y1).powi(2)).sqrt(),
+                ));
+            }
+        }
+        obstacles.sort_by(|(_, d1), (_, d2)| d1.partial_cmp(d2).unwrap());
+        obstacles.get(0).map(|ob| ob.0)
     }
 }
