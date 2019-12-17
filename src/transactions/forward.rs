@@ -39,8 +39,24 @@ pub fn forward(
                         }
                     },
                     Obstacle::Terrain(info) => {
-                        is_ignore_obstacle = false;
-                        dbg!("{} tackled to {:?}", character.model.name, info);
+                        if info == TerrainInfo::Wall {
+                            is_ignore_obstacle = false;
+                            let fixed_x = x.floor();
+                            let fixed_y = y.floor();
+                            let fix_speed = ((fixed_x - x).powi(2) + (fixed_y - y).powi(2)).sqrt();
+                            let fix_angle = (fixed_y - y).atan2(fixed_x - x);
+                            let pushed_payload = CharacterPushedPayload {
+                                angle: fix_angle,
+                                speed: fix_speed,
+                            };
+                            CharacterDispatcher::effect_pushed(&character, &pushed_payload)
+                                .and_then(|_| {
+                                    updated.push(character.entity_id);
+                                    Ok(())
+                                })
+                                .unwrap_or_else(|e| err!("{:?}", e));
+                            dbg!("{} tackled to {:?}", character.model.name, info);
+                        }
                     }
                 }
             }
