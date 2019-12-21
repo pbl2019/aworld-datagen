@@ -30,5 +30,7 @@ impl Schedule {
 }
 
 pub fn make_schedules() -> Vec<Schedule> {
-    vec![Schedule::new(hunger, 50)]
+    vec![
+        //Schedule::new(hunger, 50)
+        ]
 }

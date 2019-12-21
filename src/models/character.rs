@@ -34,6 +34,7 @@ pub struct CharacterLocal {
     pub is_dead: Field<bool>,
     pub sleep_state: Field<Sleeping>,
     pub items: Field<Vec<u64>>,
+    pub attack_charge: Field<f32>,
 }
 
 #[derive(Debug, Clone)]
@@ -81,6 +82,7 @@ impl std::convert::From<Character> for CharacterLocal {
             is_dead: init_field!(false),
             sleep_state: init_field!(sleep),
             items: init_field!(Vec::new()),
+            attack_charge: init_field!(0.),
         }
     }
 }
