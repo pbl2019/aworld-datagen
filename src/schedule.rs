@@ -1,4 +1,5 @@
 use crate::batches::hunger::hunger;
+use crate::batches::charge_down::charge_down;
 use crate::context::Context;
 use std::time::Instant;
 
@@ -32,5 +33,6 @@ impl Schedule {
 pub fn make_schedules() -> Vec<Schedule> {
     vec![
         //Schedule::new(hunger, 50)
+        Schedule::new(charge_down, 10)
         ]
 }
