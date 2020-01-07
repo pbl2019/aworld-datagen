@@ -51,35 +51,35 @@ impl Context {
             obstacles.push((Obstacle::Object(ob.0), ob.1))
         }
         {
-            let num_iter = distance * 10.0 + 1.0;
+            let num_iter = distance * 100.0 + 10.0;
             let delta_x = (x1 - x0) / num_iter;
             let delta_y = (y1 - y0) / num_iter;
             let mut cur_x = x0;
             let mut cur_y = y0;
-            let width = self.terrain.model.width as usize;
-            let height = self.terrain.model.height as usize;
+            let width = self.terrain.model.width as isize;
+            let height = self.terrain.model.height as isize;
             let raw = self.terrain.raw.read();
             for i in 0..(num_iter as usize) + 1 {
-                let ix = cur_x.floor() as usize;
-                let iy = cur_y.floor() as usize;
-                if raw[ix + iy * width] == TerrainInfo::Wall as u8 {
+                if cur_x < 0. || width as f32 <= cur_x || cur_y < 0. || height as f32 <= cur_y {
+                    println!("overflow: {}, {}", cur_x, cur_y);
                     obstacles.push((
                         Obstacle::Terrain(TerrainInfo::Wall),
                         ((x0 - cur_x).powi(2) + (y0 - cur_y).powi(2)).sqrt(),
                     ));
                     break;
                 }
+                let ix = cur_x.floor() as isize;
+                let iy = cur_y.floor() as isize;
+                // tackle to world bounds
+                if raw[(ix + iy * width) as usize] == TerrainInfo::Wall as u8 {
+                    obstacles.push((
+                        Obstacle::Terrain(TerrainInfo::Wall),
+                        ((x0 - cur_x.floor()).powi(2) + (y0 - cur_y.floor()).powi(2)).sqrt(),
+                    ));
+                    break;
+                }
                 cur_x += delta_x;
                 cur_y += delta_y;
-            }
-            let ix = x1.floor() as usize;
-            let iy = y1.floor() as usize;
-            println!("move to {}, {}", ix, iy);
-            if raw[ix + iy * width] == TerrainInfo::Wall as u8 {
-                obstacles.push((
-                    Obstacle::Terrain(TerrainInfo::Wall),
-                    ((x0 - x1).powi(2) + (y0 - y1).powi(2)).sqrt(),
-                ));
             }
         }
         obstacles.sort_by(|(_, d1), (_, d2)| d1.partial_cmp(d2).unwrap());

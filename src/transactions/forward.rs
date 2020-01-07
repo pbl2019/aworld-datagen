@@ -15,6 +15,8 @@ pub fn forward(
     context
         .get_character_from_connection(conn)
         .and_then(|character| {
+            let width = context.terrain.model.width;
+            let height = context.terrain.model.height;
             let x = character.x.read();
             let y = character.y.read();
             let angle = character.angle.read();
@@ -41,20 +43,31 @@ pub fn forward(
                     Obstacle::Terrain(info) => {
                         if info == TerrainInfo::Wall {
                             is_ignore_obstacle = false;
-                            let fixed_x = x.floor();
-                            let fixed_y = y.floor();
+                            // let fixed_x = x.floor().max(1.0).min((width - 1) as f32) - 0.50;
+                            // let fixed_y = y.floor().max(1.0).min((height - 1) as f32) - 0.50;
+                            let mut fixed_x = x + speed * (angle + std::f32::consts::PI).cos();
+                            let mut fixed_y = y + speed * (angle * std::f32::consts::PI).sin();
+                            if fixed_x.floor() as i32 != x.floor() as i32 {
+                                fixed_x = x.floor().max(0.0).min((width - 1) as f32) + 0.5;
+                            }
+                            if fixed_y.floor() as i32 != y.floor() as i32 {
+                                fixed_y = y.floor().max(0.0).min((height - 1) as f32) + 0.5;
+                            }
+                            println!("{}, {}", fixed_x, fixed_y);
                             let fix_speed = ((fixed_x - x).powi(2) + (fixed_y - y).powi(2)).sqrt();
                             let fix_angle = (fixed_y - y).atan2(fixed_x - x);
                             let pushed_payload = CharacterPushedPayload {
                                 angle: fix_angle,
                                 speed: fix_speed,
                             };
-                            CharacterDispatcher::effect_pushed(&character, &pushed_payload)
-                                .and_then(|_| {
-                                    updated.push(character.entity_id);
-                                    Ok(())
-                                })
-                                .unwrap_or_else(|e| err!("{:?}", e));
+                            character.x.write(fixed_x);
+                            character.y.write(fixed_y);
+                            // CharacterDispatcher::effect_pushed(&character, &pushed_payload)
+                            //     .and_then(|_| {
+                            //         updated.push(character.entity_id);
+                            //         Ok(())
+                            //     })
+                            //     .unwrap_or_else(|e| err!("{:?}", e));
                             dbg!("{} tackled to {:?}", character.model.name, info);
                         }
                     }
