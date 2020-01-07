@@ -6,7 +6,7 @@ use crate::err;
 use crate::models::terrain::*;
 use crate::models::ObjectId;
 
-const FULL_CHARGE:f32 = 100.0;
+const FULL_CHARGE:f32 = 50.0;
 
 pub fn attack(conn: &Connection, context: &mut Context) -> Result<Vec<u64>, String> {
     let mut updated = Vec::new();
@@ -31,7 +31,7 @@ pub fn attack(conn: &Connection, context: &mut Context) -> Result<Vec<u64>, Stri
                                 Ok(())
                             })
                             .and_then(|_| {
-                                updated.push(character.entity_id);
+                                updated.push(character_id);
                                 Ok(())
                             })
                             .unwrap_or_else(|e| err!("{:?}", e));
