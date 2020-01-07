@@ -2,14 +2,13 @@
 use aworld_datagen::actions::Action;
 use aworld_datagen::batches::hunger::*;
 use aworld_datagen::connection::Connection;
-use aworld_datagen::context::Context;
 use aworld_datagen::mappers::query_to_action;
-use aworld_datagen::models::item::*;
-use aworld_datagen::models::{terrain::*, Entity};
+use aworld_datagen::models::{Entity};
 use aworld_datagen::query::*;
 use aworld_datagen::schedule::*;
 use aworld_datagen::transactions::call_transaction_with;
 use aworld_datagen::{dbg, err, log};
+use aworld_datagen::environment;
 use std::collections::VecDeque;
 use std::fmt;
 use std::io;
@@ -159,32 +158,8 @@ fn main() {
         receiver.socket.local_addr().unwrap(),
     );
 
-    let new_terrain = NewTerrain::with_size(50, 50);
-    let terrain = Terrain {
-        id: 0,
-        content: new_terrain.content,
-        width: new_terrain.width,
-        height: new_terrain.height,
-    };
-    let terrain_local = TerrainLocal::from(terrain);
-    let context = Arc::new(RwLock::new(Context::new(terrain_local)));
-    {
-        use aworld_datagen::models::item::ItemType;
-        let new_item = NewItem::default();
-        let item = Item {
-            id: 1,
-            name: new_item.name,
-            item_type: ItemType::Food,
-            amount: new_item.amount,
-        };
-        let item_local = ItemLocal::from(item);
-        item_local.x.write(10.0);
-        item_local.y.write(10.0);
-        context
-            .write()
-            .unwrap()
-            .insert_entity(Entity::Item(Arc::new(item_local)));
-    }
+    let context = environment::new();
+
     let context2 = context.clone();
     let context3 = context.clone();
 

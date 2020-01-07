@@ -18,3 +18,4 @@ pub mod schema;
 pub mod services;
 pub mod transactions;
 pub mod utils;
+pub mod environment;
