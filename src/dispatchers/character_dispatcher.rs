@@ -27,8 +27,8 @@ impl CharacterDispatcher {
         payload: &CharacterTurnLeftPayload,
     ) -> Result<()> {
         let mut angle = store.angle.read() - payload.angle;
-        if angle < -PI {
-            angle = (2. * PI - angle).rem_euclid(2. * PI);
+        if angle < 0.0 {
+            angle = (2. * PI - angle);//.rem_euclid(2. * PI);
         }
         store.angle.write(angle);
         Ok(())
