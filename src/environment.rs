@@ -20,41 +20,26 @@ impl Environment {
         let terrain_local = TerrainLocal::from(terrain);
         let context = Arc::new(RwLock::new(Context::new(terrain_local)));
         {
-            let new_item = NewItem::default();
-            let item = Item {
-                id: 1,
-                name: new_item.name,
-                item_type: ItemType::Food,
-                amount: new_item.amount,
-            };
-            let item_local = ItemLocal::from(item);
-            item_local.x.write(10.0);
-            item_local.y.write(10.0);
-            context
-                .write()
-                .unwrap()
-                .insert_entity(Entity::Item(Arc::new(item_local)));
+            Self::generate_meet(&mut context.write().unwrap(), 10.0, 10.0).unwrap();
         }
         
         return context;
     }
 
-    pub fn generate_meet(context: &mut Context, x: f32, y: f32) -> Result<()> {
-        {
-            let new_item = NewItem::default();
-            let item = Item {
-                id: counter::get_count() as i64,
-                name: new_item.name,
-                item_type: ItemType::Food,
-                amount: new_item.amount,
-            };
-            let item_local = ItemLocal::from(item);
-            item_local.x.write(x);
-            item_local.y.write(y);
+    pub fn generate_meet(context: &mut Context, x: f32, y: f32) -> Result<u64> {
+        let new_item = NewItem::default();
+        let item = Item {
+            id: counter::get_count() as i64,
+            name: new_item.name,
+            item_type: ItemType::Food,
+            amount: new_item.amount,
+        };
+        let item_local = ItemLocal::from(item);
+        item_local.x.write(x);
+        item_local.y.write(y);
+        let entity_id = item_local.entity_id;
 
-            context.insert_entity(Entity::Item(Arc::new(item_local)));
-        }
-
-        Ok(())
+        context.insert_entity(Entity::Item(Arc::new(item_local)));
+        Ok(entity_id)
     }
 }
