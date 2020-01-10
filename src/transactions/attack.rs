@@ -5,6 +5,8 @@ use crate::dispatchers::character_dispatcher::CharacterDispatcher;
 use crate::err;
 use crate::models::terrain::*;
 use crate::models::ObjectId;
+use crate::environment::Environment;
+use std::sync::{Arc, RwLock};
 
 const FULL_CHARGE:f32 = 50.0;
 
@@ -22,10 +24,18 @@ pub fn attack(conn: &Connection, context: &mut Context) -> Result<Vec<u64>, Stri
                     if let Obstacle::Object(object_id) = obstacle {
                         if let ObjectId::Character(character_id) = object_id {
                             let target = context.characters.get(&character_id).unwrap();
+                            let target_clone = Arc::new(target.clone());
                             CharacterDispatcher::effect_damage(
                                 target,
                                 &CharacterDamagedPayload { amount: 10 },
                             )
+                            .and_then(|_| {
+                                if target_clone.is_dead.read() {
+                                    let item_id = Environment::generate_meet(context, target_clone.x.read(), target_clone.y.read()).unwrap();
+                                    updated.push(item_id);
+                                }
+                                Ok(())
+                            })
                             .and_then(|_| {
                                 character.attack_charge.write(0.0);
                                 Ok(())
