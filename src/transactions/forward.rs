@@ -15,6 +15,8 @@ pub fn forward(
     context
         .get_character_from_connection(conn)
         .and_then(|character| {
+            let width = context.terrain.model.width;
+            let height = context.terrain.model.height;
             let x = character.x.read();
             let y = character.y.read();
             let angle = character.angle.read();
