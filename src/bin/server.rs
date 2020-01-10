@@ -8,7 +8,7 @@ use aworld_datagen::query::*;
 use aworld_datagen::schedule::*;
 use aworld_datagen::transactions::call_transaction_with;
 use aworld_datagen::{dbg, err, log};
-use aworld_datagen::environment;
+use aworld_datagen::environment::Environment;
 use std::collections::VecDeque;
 use std::fmt;
 use std::io;
@@ -159,7 +159,7 @@ fn main() {
         receiver.socket.local_addr().unwrap(),
     );
 
-    let context = environment::new();
+    let context = Environment::new();
 
     let context2 = context.clone();
     let context3 = context.clone();
