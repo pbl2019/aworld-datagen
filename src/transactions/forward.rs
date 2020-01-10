@@ -41,14 +41,20 @@ pub fn forward(
                     Obstacle::Terrain(info) => {
                         if info == TerrainInfo::Wall {
                             is_ignore_obstacle = false;
-                            let fixed_x = x.floor();
-                            let fixed_y = y.floor();
-                            let fix_speed = ((fixed_x - x).powi(2) + (fixed_y - y).powi(2)).sqrt();
+                            const pi : f32 = std::f32::consts::PI;
+                            let mut fixed_x = x.floor();
+                            let mut fixed_y = y.floor(); 
+                            if pi <= angle && angle <= 1.5 * pi {
+                                fixed_x = x.ceil();
+                                fixed_y = y.ceil();
+                            } 
+                            let fix_speed = (((fixed_x - x).powi(2) + (fixed_y - y).powi(2)).sqrt())/2.0;
                             let fix_angle = (fixed_y - y).atan2(fixed_x - x);
                             let pushed_payload = CharacterPushedPayload {
                                 angle: fix_angle,
                                 speed: fix_speed,
                             };
+                            
                             CharacterDispatcher::effect_pushed(&character, &pushed_payload)
                                 .and_then(|_| {
                                     updated.push(character.entity_id);
