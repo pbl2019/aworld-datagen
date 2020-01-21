@@ -5,6 +5,7 @@ use crate::models::{character::*, Entity};
 use crate::utils::generate_random_name;
 use chrono::Utc;
 use std::sync::Arc;
+use rand::Rng;
 
 pub fn login(
     conn: &Connection,
@@ -54,6 +55,9 @@ pub fn login(
                     max_appetite: 8000,
                 };
                 let character_local = CharacterLocal::from(character);
+                let (x, y) = context.terrain.randpos();
+                character_local.x.write(x);
+                character_local.y.write(y);
                 character_local.angle.write(0.0);
                 // updated.push(character_local.entity_id);
                 updated.extend_from_slice(&context.get_entity_ids());

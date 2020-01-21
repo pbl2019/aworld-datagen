@@ -43,6 +43,25 @@ pub struct TerrainLocal {
     pub object_ids: Field<Vec<ObjectId>>,
 }
 
+impl TerrainLocal {
+    pub fn randpos(&self) -> (f32, f32) {
+        let mut rng = rand::thread_rng();
+        let mut x = 0.;
+        let mut y = 0.;
+        for _ in 0..20 {
+            let _x = rng.gen_range(0., self.model.width as f32);
+            let _y = rng.gen_range(0., self.model.height as f32);
+            let raw = self.raw.read();
+            if (raw[(_x as i32+_y as i32*self.model.height) as usize] == 0){
+                x = _x;
+                y = _y;
+                break
+            }
+        }
+        (x, y)
+    }
+}
+
 impl NewTerrain {
     pub fn with_size(width: usize, height: usize) -> Self {
         let raw = NewTerrain::generate(width, height);
