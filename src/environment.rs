@@ -19,21 +19,16 @@ impl Environment {
             height: new_terrain.height,
         };
         let terrain_local = TerrainLocal::from(terrain);
-
-        let mut rng = rand::thread_rng();
-        let max_weapon: i64 = rng.gen_range(0., 20.) as i64;
-        let mut weapons_position: Vec<[f32; 2]> = Vec::new();
-        for _ in 0..max_weapon {
-            let (x, y) = terrain_local.randpos();
-            let position = [x, y];
-            weapons_position.push(position);
-        }
-
         let context = Arc::new(RwLock::new(Context::new(terrain_local)));
         {
-            Self::generate_meet(&mut context.write().unwrap(), 10.0, 10.0).unwrap();
-            for [x, y] in weapons_position.into_iter() {
-                Self::generate_weapon(&mut context.write().unwrap(), x, y).unwrap();
+            let lock = &mut context.write().unwrap();
+            Self::generate_meet(lock, 10.0, 10.0).unwrap();
+            
+            let mut rng = rand::thread_rng();
+            let max_weapon: i64 = rng.gen_range(0., 20.) as i64;
+            for _ in 0..max_weapon {
+                let (x, y) = lock.terrain.randpos();
+                Self::generate_weapon(lock, x, y).unwrap();
             }
         }
         
