@@ -22,13 +22,12 @@ impl Environment {
         let context = Arc::new(RwLock::new(Context::new(terrain_local)));
         {
             let lock = &mut context.write().unwrap();
-            Self::generate_meet(lock, 10.0, 10.0).unwrap();
             
             let mut rng = rand::thread_rng();
             let max_weapon: i64 = rng.gen_range(0., 20.) as i64;
             for _ in 0..max_weapon {
                 let (x, y) = lock.terrain.randpos();
-                Self::generate_weapon(lock, x, y).unwrap();
+                Self::generate_meet(lock, x, y).unwrap();
             }
         }
         
