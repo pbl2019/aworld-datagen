@@ -24,8 +24,8 @@ impl Environment {
             let lock = &mut context.write().unwrap();
             
             let mut rng = rand::thread_rng();
-            let max_weapon: i64 = rng.gen_range(0., 20.) as i64;
-            for _ in 0..max_weapon {
+            let max_food: i64 = rng.gen_range(0., 20.) as i64;
+            for _ in 0..max_food {
                 let (x, y) = lock.terrain.randpos();
                 Self::generate_meet(lock, x, y).unwrap();
             }
